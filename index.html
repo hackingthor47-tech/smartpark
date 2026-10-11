@@ -1,0 +1,225 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ParkSmart Dashboard</title>
+<style>
+*{box-sizing:border-box}
+body{
+  margin:0;padding:20px;font-family:Arial,sans-serif;
+  background:#0b1220;color:#f1f5f9
+}
+main{max-width:850px;margin:auto}
+h1{color:#38bdf8}
+.panel{
+  background:#172033;padding:18px;border-radius:14px;
+  margin:16px 0;border:1px solid #334155
+}
+.slots{
+  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:12px
+}
+.slot{
+  background:#243147;padding:18px 8px;border-radius:12px;
+  text-align:center
+}
+.car{font-size:30px;margin:8px}
+.status{font-weight:bold;margin:8px 0}
+.free{color:#4ade80}
+.occupied{color:#fb7185}
+.booked{color:#fbbf24}
+button,select{
+  padding:11px;border:0;border-radius:7px;font-size:15px
+}
+button{background:#0284c7;color:white;cursor:pointer;margin:4px}
+.cancel{background:#e11d48}
+button:disabled{opacity:.4;cursor:not-allowed}
+select{width:100%;margin:8px 0;background:#fff}
+.muted{color:#94a3b8}
+@media(min-width:600px){
+  .slots{grid-template-columns:repeat(4,minmax(0,1fr))}
+}
+</style>
+</head>
+<body>
+<main>
+<h1>🅿️ ParkSmart</h1>
+<p class="muted">Smart Parking & Slot Booking System</p>
+
+<section class="panel">
+<h2>Parking Slots</h2>
+<div class="slots" id="slots"></div>
+<h3>Available: <span id="count">4</span> / 4</h3>
+<p id="connection" class="muted">Starting dashboard...</p>
+</section>
+
+<section class="panel">
+<h2>Book / Cancel Slot</h2>
+<label for="slotChoice">Select parking slot</label>
+<select id="slotChoice">
+  <option value="slot1">Slot 1</option>
+  <option value="slot2">Slot 2</option>
+  <option value="slot3">Slot 3</option>
+  <option value="slot4">Slot 4</option>
+</select>
+<div>
+  <button id="book">Book Slot</button>
+  <button id="cancel" class="cancel">Cancel Booking</button>
+</div>
+<p id="message" class="muted">Select a slot to begin.</p>
+</section>
+
+<section class="panel">
+<h2>Gate Status</h2>
+<p>Entry sensor: <b id="entry">Waiting</b></p>
+<p>Exit sensor: <b id="exit">Waiting</b></p>
+<p class="muted">Physical gate movement is controlled by the ESP32.</p>
+</section>
+</main>
+
+<script type="module">
+import {initializeApp} from
+"https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
+import {getDatabase,ref,onValue,set,remove} from
+"https://www.gstatic.com/firebasejs/12.4.0/firebase-database.js";
+
+// Paste your Firebase web configuration here.
+const firebaseConfig={
+  apiKey:"AIzaSyDVBvMtUStVKjGxLV39KIrQk4AflyB4mZo",
+  authDomain:"https://parkplot-1ed61.firebaseapp.com",
+  databaseURL:"https://parkplot-1ed61-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId:"parkplot-1ed61",
+  appId:"1:735709488786:web:3cf1fe846cba2df3fde84b"
+};
+
+const ids=["slot1","slot2","slot3","slot4"];
+const $=id=>document.getElementById(id);
+let db=null, sensorData=null, bookings={};
+
+function occupied(value){
+  if(typeof value==="boolean") return value;
+  if(typeof value==="number") return value===1;
+  if(typeof value==="string"){
+    const v=value.toLowerCase();
+    if(["occupied","true","1"].includes(v)) return true;
+    if(["available","false","0"].includes(v)) return false;
+  }
+  if(value && typeof value.occupied==="boolean") return value.occupied;
+  return null;
+}
+
+function render(){
+  const root=$("slots");
+  root.replaceChildren();
+  let available=0;
+
+  ids.forEach((id,i)=>{
+    const isOccupied=occupied(sensorData?.[id]);
+    const isBooked=!!bookings[id];
+    if(isOccupied===false&&!isBooked) available++;
+
+    const card=document.createElement("div");
+    card.className="slot";
+    const title=document.createElement("h3");
+    title.textContent="Slot "+(i+1);
+    const car=document.createElement("div");
+    car.className="car";
+    car.textContent=isOccupied===true?"🚗":"🅿️";
+    const status=document.createElement("div");
+    status.className="status";
+
+    if(isOccupied===null){
+      status.classList.add("muted");
+      status.textContent="Waiting for sensor";
+    }else if(isOccupied){
+      status.classList.add("occupied");
+      status.textContent="OCCUPIED";
+    }else if(isBooked){
+      status.classList.add("booked");
+      status.textContent="BOOKED";
+    }else{
+      status.classList.add("free");
+      status.textContent="AVAILABLE";
+    }
+    card.append(title,car,status);
+    root.append(card);
+  });
+
+  $("count").textContent=sensorData===null?"--":available;
+}
+
+function showGate(data){
+  $("entry").textContent=data?.entry??"Waiting";
+  $("exit").textContent=data?.exit??"Waiting";
+}
+
+$("book").addEventListener("click",async()=>{
+  if(!db) return $("message").textContent="Add Firebase configuration first.";
+  const id=$("slotChoice").value;
+  if(sensorData===null)
+    return $("message").textContent="Waiting for sensor data.";
+  if(occupied(sensorData[id])!==false)
+    return $("message").textContent="Slot is occupied or sensor data is missing.";
+  if(bookings[id])
+    return $("message").textContent="This slot is already booked.";
+
+  try{
+    await set(ref(db,"parksmart/bookings/"+id),{
+      status:"booked",
+      createdAt:Date.now()
+    });
+    $("message").textContent=id.toUpperCase()+" booked.";
+  }catch(e){
+    $("message").textContent="Booking failed: "+e.message;
+  }
+});
+
+$("cancel").addEventListener("click",async()=>{
+  if(!db) return $("message").textContent="Add Firebase configuration first.";
+  const id=$("slotChoice").value;
+  if(!bookings[id])
+    return $("message").textContent="This slot has no booking.";
+
+  try{
+    await remove(ref(db,"parksmart/bookings/"+id));
+    $("message").textContent=id.toUpperCase()+" booking cancelled.";
+  }catch(e){
+    $("message").textContent="Cancellation failed: "+e.message;
+  }
+});
+
+const placeholders=Object.values(firebaseConfig).some(
+  v=>typeof v==="string"&&v.startsWith("YOUR_")
+);
+
+if(placeholders){
+  $("connection").textContent="Firebase configuration required.";
+  render();
+}else{
+  try{
+    db=initializeApp(firebaseConfig);
+    db=getDatabase(db);
+
+    onValue(ref(db,"parksmart/slots"),snap=>{
+      sensorData=snap.val();
+      render();
+      $("connection").textContent=sensorData
+        ?"Live slot data received from Firebase."
+        :"Connected, but no slot sensor data yet.";
+    },e=>$("connection").textContent="Slot data error: "+e.message);
+
+    onValue(ref(db,"parksmart/bookings"),snap=>{
+      bookings=snap.val()||{};
+      render();
+    },e=>$("message").textContent="Booking data error: "+e.message);
+
+    onValue(ref(db,"parksmart/gate"),snap=>showGate(snap.val()));
+  }catch(e){
+    $("connection").textContent="Firebase error: "+e.message;
+  }
+}
+</script>
+</body>
+</html>
