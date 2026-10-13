@@ -17,6 +17,7 @@ a{color:#7dd3fc}
 input{display:block;width:100%;padding:11px;margin:7px 0 12px;background:#091626;color:white;border:1px solid #30435d;border-radius:8px}
 button{padding:10px 13px;margin-top:9px;border:0;border-radius:8px;background:#38bdf8;color:#062033;font-weight:bold;cursor:pointer}
 button.secondary{background:#30435d;color:white}
+button:disabled{opacity:.55;cursor:not-allowed}
 .good{color:#4ade80}.bad{color:#fb7185}
 .item{padding:10px 0;border-bottom:1px solid #30435d;overflow-wrap:anywhere}
 </style>
@@ -25,7 +26,7 @@ button.secondary{background:#30435d;color:white}
 <main>
 <header>
 <h1>🚗 ParkSmart Consumer</h1>
-<p class="muted">Book parking and save your parking location.</p>
+<p class="muted">Live slots · Book or cancel · Save your parking location</p>
 <a href="./index.html">← Home</a>
 <p id="connection">Connecting to Firebase…</p>
 </header>
@@ -38,7 +39,6 @@ button.secondary{background:#30435d;color:white}
 <div class="grid">
 <section class="panel">
 <h2>Save Parking Location</h2>
-<p class="muted">Paste QR text/URL or enter your location manually.</p>
 <label>Venue</label>
 <input id="venue" placeholder="College Parking">
 <label>Floor / Slot / Landmark</label>
@@ -47,10 +47,9 @@ button.secondary{background:#30435d;color:white}
 <input id="qr" placeholder="Paste QR content">
 <button id="save">Save Location</button>
 </section>
-
 <section class="panel">
 <h2>My Local History</h2>
-<p class="muted">Stored in this browser only.</p>
+<p class="muted">History is stored in this browser.</p>
 <div id="history"></div>
 <button class="secondary" id="clear">Clear History</button>
 </section>
@@ -79,112 +78,190 @@ const app=initializeApp(config);
 const auth=getAuth(app);
 const db=getDatabase(app);
 const ids=["slot1","slot2","slot3","slot4"];
-let uid=null, slots={}, bookings={};
+let uid=null,slots={},bookings={};
 const $=id=>document.getElementById(id);
 
-function status(v){
- if(typeof v==="string")return v.trim().toUpperCase();
- if(v&&typeof v==="object")
-   return String(v.status||v.state||"AVAILABLE").toUpperCase();
- return "AVAILABLE";
+function sensorStatus(value){
+ if(typeof value==="string"){
+  const s=value.trim().toUpperCase();
+  return ["AVAILABLE","OCCUPIED"].includes(s)?s:"UNKNOWN";
+ }
+ if(value&&typeof value==="object"){
+  const s=String(value.status??value.state??"").trim().toUpperCase();
+  return ["AVAILABLE","OCCUPIED"].includes(s)?s:"UNKNOWN";
+ }
+ return "UNKNOWN";
 }
-function esc(v){
- return String(v??"").replace(/[&<>"']/g,c=>({
- "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+
+function validBooking(value){
+ return !!(
+  value &&
+  typeof value==="object" &&
+  typeof value.uid==="string" &&
+  value.uid.length>0 &&
+  String(value.status||"").toUpperCase()==="BOOKED"
+ );
+}
+
+function esc(value){
+ return String(value??"").replace(/[&<>"']/g,c=>({
+  "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
  }[c]));
 }
-function history(){
+
+function getHistory(){
  try{return JSON.parse(localStorage.getItem("ps_history")||"[]")}
  catch{return []}
 }
+
 function addHistory(title,detail){
- const h=history();
- h.unshift({title,detail,time:new Date().toLocaleString()});
- localStorage.setItem("ps_history",JSON.stringify(h.slice(0,30)));
+ const list=getHistory();
+ list.unshift({title,detail,time:new Date().toLocaleString()});
+ localStorage.setItem("ps_history",JSON.stringify(list.slice(0,30)));
  showHistory();
 }
+
 function showHistory(){
- $("history").innerHTML=history().map(x=>
- '<div class="item"><b>'+esc(x.title)+'</b><div>'+esc(x.detail)+'</div><small class="muted">'+esc(x.time)+'</small></div>'
+ $("history").innerHTML=getHistory().map(x=>
+  '<div class="item"><b>'+esc(x.title)+'</b><div>'+
+  esc(x.detail)+'</div><small class="muted">'+
+  esc(x.time)+'</small></div>'
  ).join("")||'<p class="muted">No history yet.</p>';
 }
+
 function render(){
  $("slots").innerHTML=ids.map(id=>{
-   const s=status(slots[id]??"AVAILABLE");
-   const b=bookings[id];
-   const mine=!!(b&&uid&&b.uid===uid);
-   const free=s==="AVAILABLE"&&!b;
-   return '<article class="slot"><h3>'+id.replace("slot","Slot ")+'</h3>'+
-    '<p class="'+(s==="AVAILABLE"?"good":"bad")+'">Sensor: '+esc(s)+'</p>'+
-    '<p>Booking: '+(b?(mine?"Your booking":"Reserved"):"None")+'</p>'+
-    (mine?'<button class="secondary" data-cancel="'+id+'">Cancel</button>':
-     free?'<button data-book="'+id+'">Book Slot</button>':
-     '<button disabled>Unavailable</button>')+'</article>';
+  const sensor=sensorStatus(slots[id]);
+  const raw=bookings[id];
+  const booking=validBooking(raw)?raw:null;
+  const mine=!!(booking&&uid&&booking.uid===uid);
+  const free=sensor==="AVAILABLE"&&!booking;
+
+  let bookingText="None";
+  if(booking) bookingText=mine?"Your booking":"Reserved";
+
+  let button="";
+  if(mine){
+   button='<button class="secondary" data-cancel="'+id+'">Cancel booking</button>';
+  }else if(free){
+   button='<button data-book="'+id+'">Book Slot</button>';
+  }else{
+   button='<button disabled>Unavailable</button>';
+  }
+
+  return '<article class="slot"><h3>'+id.replace("slot","Slot ")+'</h3>'+
+   '<p class="'+(sensor==="AVAILABLE"?"good":sensor==="UNKNOWN"?"muted":"bad")+
+   '">Sensor: '+esc(sensor)+'</p>'+
+   '<p>Booking: '+bookingText+'</p>'+button+'</article>';
  }).join("");
- document.querySelectorAll("[data-book]").forEach(b=>
-   b.onclick=()=>book(b.dataset.book));
- document.querySelectorAll("[data-cancel]").forEach(b=>
-   b.onclick=()=>cancel(b.dataset.cancel));
+
+ document.querySelectorAll("[data-book]").forEach(button=>{
+  button.onclick=()=>book(button.dataset.book);
+ });
+ document.querySelectorAll("[data-cancel]").forEach(button=>{
+  button.onclick=()=>cancel(button.dataset.cancel);
+ });
 }
+
 async function book(id){
- if(!uid)return alert("Firebase sign-in is not ready.");
- if(status(slots[id]??"AVAILABLE")!=="AVAILABLE")
-   return alert("Sensor says this slot is occupied.");
+ if(!uid){alert("Firebase is not ready. Refresh and try again.");return;}
+ if(sensorStatus(slots[id])!=="AVAILABLE"){
+  alert("Slot sensor is not reporting AVAILABLE.");
+  return;
+ }
  try{
   const result=await runTransaction(ref(db,"parksmart/bookings/"+id),old=>{
-   if(old)return;
-   return {uid,slot:id,status:"BOOKED",createdAt:Date.now(),source:"consumer"};
+   if(old!==null)return;
+   return {
+    uid:uid,
+    slot:id,
+    status:"BOOKED",
+    createdAt:Date.now(),
+    source:"consumer"
+   };
   });
   if(result.committed){
-   addHistory("Booked "+id,"Booking saved to Firebase");
+   addHistory("Booked "+id,"Booking saved to Firebase.");
    alert("Booking successful!");
-  }else alert("Slot is already booked.");
- }catch(e){alert("Booking failed: "+e.message)}
+  }else{
+   alert("This slot is already booked. Refresh the dashboard.");
+  }
+ }catch(error){
+  alert("Booking failed: "+error.message);
+ }
 }
+
 async function cancel(id){
  if(!uid)return;
  try{
-  const result=await runTransaction(ref(db,"parksmart/bookings/"+id),old=>
-   old&&old.uid===uid?null:old);
+  const result=await runTransaction(ref(db,"parksmart/bookings/"+id),old=>{
+   if(old && old.uid===uid)return null;
+   return;
+  });
   if(result.committed){
-   addHistory("Cancelled "+id,"Cancellation saved to Firebase");
+   addHistory("Cancelled "+id,"Cancellation saved to Firebase.");
    alert("Booking cancelled.");
-  }else alert("Could not cancel this booking.");
- }catch(e){alert("Cancel failed: "+e.message)}
+  }else{
+   alert("Only the account that made this booking can cancel it.");
+  }
+ }catch(error){
+  alert("Cancel failed: "+error.message);
+ }
 }
+
 $("save").onclick=()=>{
  const venue=$("venue").value.trim();
  const location=$("location").value.trim();
  const qr=$("qr").value.trim();
- if(!venue&&!location&&!qr)return alert("Enter a location or QR text.");
+ if(!venue&&!location&&!qr){
+  alert("Enter a venue, location or QR text.");
+  return;
+ }
  const item={venue,location,qr,time:new Date().toLocaleString()};
- const old=JSON.parse(localStorage.getItem("ps_locations")||"[]");
- old.unshift(item);
- localStorage.setItem("ps_locations",JSON.stringify(old.slice(0,30)));
- addHistory("Saved parking location",[venue,location,qr].filter(Boolean).join(" · "));
- alert("Location saved on this browser.");
+ try{
+  const list=JSON.parse(localStorage.getItem("ps_locations")||"[]");
+  list.unshift(item);
+  localStorage.setItem("ps_locations",JSON.stringify(list.slice(0,30)));
+  addHistory("Saved parking location",
+   [venue,location,qr].filter(Boolean).join(" · "));
+  alert("Parking location saved on this browser.");
+ }catch(error){
+  alert("Could not save location: "+error.message);
+ }
 };
+
 $("clear").onclick=()=>{
  if(confirm("Clear local history?")){
   localStorage.removeItem("ps_history");
   showHistory();
  }
 };
+
 showHistory();
 
 try{
  const credential=await signInAnonymously(auth);
  uid=credential.user.uid;
+
  $("connection").textContent="Firebase connected";
  $("connection").className="good";
- onValue(ref(db,"parksmart/slots"),s=>{
-   slots=s.val()||{};render();
- },e=>{$("connection").textContent="Slot read error: "+e.message});
- onValue(ref(db,"parksmart/bookings"),s=>{
-   bookings=s.val()||{};render();
- },e=>{$("connection").textContent="Booking read error: "+e.message});
-}catch(e){
- $("connection").textContent="Firebase error: "+e.message;
+
+ onValue(ref(db,"parksmart/slots"),snapshot=>{
+  slots=snapshot.val()||{};
+  render();
+ },error=>{
+  $("connection").textContent="Slot read error: "+error.message;
+ });
+
+ onValue(ref(db,"parksmart/bookings"),snapshot=>{
+  const data=snapshot.val();
+  bookings=data&&typeof data==="object"?data:{};
+  render();
+ },error=>{
+  $("connection").textContent="Booking read error: "+error.message;
+ });
+}catch(error){
+ $("connection").textContent="Firebase error: "+error.message;
  $("slots").textContent="Check internet, Anonymous Authentication and database rules.";
 }
 </script>
