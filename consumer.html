@@ -558,6 +558,7 @@ renderSlots();
 try{
  const c=await signInAnonymously(auth);
  uid=c.user.uid;
+ console.log("Consumer Firebase UID:", uid);
 
  $("connection").textContent="● Firebase connected";
  $("connection").style.color="var(--green)";
