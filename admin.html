@@ -4,461 +4,137 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#08111f">
 <title>ParkSmart | Admin Dashboard</title>
 <style>
-:root{--bg:#08111f;--panel:#111f33;--line:#293d56;--text:#f2f7ff;--muted:#a4b5ca;--cyan:#53d9f5;--green:#4be0a0;--red:#fb7185;--amber:#fbbf24}
+:root{--bg:#06101f;--panel:rgba(8,26,47,.95);--line:#285071;--text:#f1f7ff;--muted:#a8bdd4;--cyan:#38c9ff;--blue:#087cff;--green:#00d6a0;--red:#ff5879;--amber:#ffc247}
 *{box-sizing:border-box}
-body{margin:0;background:radial-gradient(ellipse at 50% -15%,#1b4568,transparent 50%),var(--bg);color:var(--text);font:15px/1.55 system-ui,Arial,sans-serif}
-a{color:var(--cyan);text-decoration:none}
-.wrap{width:min(1160px,94%);margin:auto}
-nav{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;padding:20px 0;border-bottom:1px solid #ffffff20}
-.brand{font-weight:850;font-size:22px}
-.links{display:flex;gap:18px;flex-wrap:wrap;color:var(--muted);font-size:14px}
-main{padding:25px 0 45px}
-h1{font-size:clamp(27px,4vw,38px);margin:0 0 8px}
-h2{font-size:20px;margin:0 0 14px}
-h3{margin:0 0 7px}
-p{margin:5px 0}
-.muted{color:var(--muted)}
-.small{font-size:12px}
-.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:13px;margin:22px 0}
-.stat,.panel{background:linear-gradient(145deg,#14263d,#0e1b2d);border:1px solid var(--line);border-radius:17px;padding:19px;min-width:0}
-.stat span{display:block;color:var(--muted);font-size:13px}
-.stat strong{display:block;font-size:27px;margin-top:4px;overflow-wrap:anywhere}
-.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
-.panel{margin-bottom:17px}
-label{display:block;color:#cbd8e8;font-size:13px;margin:12px 0 5px}
-input,select{width:100%;min-width:0;background:#091626;color:white;border:1px solid #30445e;border-radius:10px;padding:12px;font:inherit}
-input:focus,select:focus{outline:2px solid var(--cyan);outline-offset:1px}
-button,.btn{display:inline-flex;justify-content:center;align-items:center;gap:7px;border:0;border-radius:10px;padding:11px 14px;margin-top:11px;background:var(--cyan);color:#061522;font:inherit;font-weight:750;cursor:pointer}
-button:hover,.btn:hover{filter:brightness(1.08)}
-.secondary{background:#293d56;color:white}
-.danger{background:#873449;color:white}
-button:disabled{opacity:.5;cursor:not-allowed}
-.full{width:100%}
-.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-.item{background:#0b1829;border:1px solid var(--line);border-radius:12px;padding:14px;margin:10px 0;min-width:0;overflow-wrap:anywhere}
-.item-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap}
-.pill{display:inline-block;border-radius:30px;padding:4px 9px;font-size:11px;font-weight:800;background:#143a32;color:var(--green)}
-.pill.warn{background:#3b3018;color:var(--amber)}
-.pill.bad{background:#3b1d2a;color:var(--red)}
-.notice{padding:12px 14px;border:1px solid #31546b;border-radius:12px;background:#10283a;color:#c8f5ff;margin:17px 0}
-.error{color:var(--red)}
-.success{color:var(--green)}
-#message{min-height:22px;margin:12px 0;overflow-wrap:anywhere}
-#qrImage{width:260px;max-width:100%;background:white;padding:10px;border-radius:12px;display:block}
-.qrbox{margin-top:12px;background:#0b1829;border:1px solid var(--line);border-radius:12px;padding:16px;overflow-wrap:anywhere}
-.empty{padding:14px 0;color:var(--muted)}
-footer{border-top:1px solid #ffffff20;padding:22px 0 30px;color:var(--muted);font-size:12px}
-@media(max-width:760px){.grid{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.stat,.panel{padding:15px}}
-@media(max-width:420px){.links{gap:12px}.stats{gap:8px}.stat strong{font-size:23px}}
+body{margin:0;color:var(--text);font:15px/1.6 "Segoe UI",Arial,sans-serif;background:linear-gradient(115deg,#030c1ff5,#031225df),url("https://images.unsplash.com/photo-1590674899484-d5640e854abe?auto=format&fit=crop&w=2000&q=85") center/cover fixed}
+header{padding:20px 4%;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;background:#030f20ed;border-bottom:1px solid var(--line)}
+h1,h2,h3,p{margin-top:0}h1{margin-bottom:0;font-size:28px}h1 span{color:var(--cyan)}header p{color:var(--muted);margin:3px 0 0}
+nav{display:flex;gap:18px;flex-wrap:wrap}a{color:#8ce2ff;text-decoration:none;font-weight:650}
+main{max-width:1400px;margin:auto;padding:28px 20px}
+.hero{display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap;margin-bottom:22px}
+.eyebrow{font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--cyan);font-weight:800}
+.hero h2{font-size:clamp(28px,4vw,40px);margin:5px 0}.muted{color:var(--muted);font-size:13px}
+.pill,.tag{display:inline-block;border:1px solid var(--line);border-radius:25px;padding:6px 12px;background:#071a2d;color:var(--cyan);font-size:12px}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin:22px 0}
+.stat,.panel{background:linear-gradient(145deg,rgba(12,35,61,.97),rgba(5,20,39,.97));border:1px solid var(--line);border-radius:18px;box-shadow:0 12px 35px #0003}
+.stat{padding:21px}.stat small{display:block;color:var(--muted)}.stat strong{font-size:32px;color:var(--cyan)}
+.layout{display:grid;grid-template-columns:1fr 1fr;gap:18px}.panel{padding:22px;margin-bottom:18px;min-width:0}
+.panel h3{font-size:20px;margin-bottom:15px}.panel h3:after{content:"";display:block;width:45px;height:3px;margin-top:7px;background:linear-gradient(90deg,var(--cyan),transparent)}
+.formgrid{display:grid;grid-template-columns:1fr 1fr;gap:0 13px}.full{grid-column:1/-1}
+label{display:block;margin:12px 0 6px;font-weight:650;color:#d7e8fa}
+input,select{width:100%;padding:12px;border:1px solid #294966;border-radius:10px;background:#041326;color:white;font:inherit;outline:none}
+input:focus,select:focus{border-color:var(--cyan);box-shadow:0 0 0 3px #38c9ff1c}
+button{padding:10px 14px;margin:7px 5px 0 0;border:1px solid #ffffff20;border-radius:10px;background:linear-gradient(135deg,#078cff,#075bce);color:white;font:inherit;font-weight:700;cursor:pointer}
+button:hover{filter:brightness(1.15)}button.secondary{background:#203b58}button.danger{background:#a92b49}
+.item{padding:14px 0;border-bottom:1px solid #285071;overflow-wrap:anywhere}.item:last-child{border-bottom:0}
+.good{color:var(--green)}.bad{color:var(--red)}.warn{color:var(--amber)}
+.notice{padding:14px;border:1px solid var(--line);border-radius:12px;background:#061a30;overflow-wrap:anywhere}
+.qrbox{display:inline-block;background:white;padding:12px;border-radius:12px;margin-top:12px}.qrbox img{width:220px;max-width:100%;display:block}
+.small{font-size:12px;color:var(--muted)}.empty{color:var(--muted);padding:12px 0}
+@media(max-width:950px){.layout{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:600px){main{padding:14px 10px}.panel{padding:15px}.formgrid{grid-template-columns:1fr}.full{grid-column:auto}.stats{gap:8px}.stat{padding:12px}.stat strong{font-size:26px}}
 </style>
 </head>
 <body>
-<div class="wrap">
-<nav>
-  <a class="brand" href="./index.html">🅿️ ParkSmart<span style="color:var(--cyan)">.</span></a>
-  <div class="links">
-    <a href="./index.html">Home</a>
-    <a href="./hardware.html">Hardware</a>
-    <a href="./consumer.html">Consumer</a>
-    <a href="./admin.html">Admin</a>
-  </div>
-</nav>
-
+<header>
+ <div><h1>🅿️ Park<span>Smart</span></h1><p>Parking operations and venue management</p></div>
+ <nav><a href="./index.html">Home</a><a href="./consumer.html">Consumer</a><a href="./hardware.html">Hardware</a></nav>
+</header>
 <main>
-  <h1>Admin Dashboard</h1>
-  <p class="muted">Manage parking venues, pillar locations, QR markers and live parking records.</p>
-  <div class="notice">
-    QR codes generated here open the Consumer Dashboard with a unique location ID.
-    Firebase must be connected for location records to work across different devices.
+ <section class="hero">
+  <div><div class="eyebrow">Management workspace</div><h2>Admin Dashboard</h2><p class="muted">Manage venues, QR locations, sensor occupancy and bookings.</p></div>
+  <span class="pill" id="connection">Connecting to Firebase…</span>
+ </section>
+ <section class="stats">
+  <div class="stat"><small>Venues</small><strong id="venueCount">—</strong></div>
+  <div class="stat"><small>QR locations</small><strong id="locationCount">—</strong></div>
+  <div class="stat"><small>Available sensors</small><strong id="availableCount">—</strong></div>
+  <div class="stat"><small>Active bookings</small><strong id="bookingCount">—</strong></div>
+ </section>
+ <div class="layout">
+  <div>
+   <section class="panel">
+    <h3 id="venueHeading">＋ Register a venue</h3>
+    <form id="venueForm">
+     <input id="venueEditId" type="hidden">
+     <label for="venueName">Venue name *</label><input id="venueName" required placeholder="Grand Mall Parking">
+     <div class="formgrid">
+      <div><label for="venueType">Venue type</label><select id="venueType"><option>Mall</option><option>College / University</option><option>Hospital</option><option>Office</option><option>Airport / Railway</option><option>Street Parking</option><option>Other</option></select></div>
+      <div><label for="venueCity">City / area</label><input id="venueCity" placeholder="Salem"></div>
+      <div class="full"><label for="venueAddress">Address / notes</label><input id="venueAddress" placeholder="Main entrance, basement parking"></div>
+     </div>
+     <button type="submit" id="venueSubmit">Save Venue</button><button type="button" class="secondary" id="venueReset">Clear</button>
+    </form>
+   </section>
+   <section class="panel">
+    <h3 id="locationHeading">▦ Create parking QR location</h3>
+    <form id="locationForm">
+     <input id="locationEditId" type="hidden">
+     <label for="venueSelect">Venue *</label><select id="venueSelect" required><option value="">Choose venue</option></select>
+     <div class="formgrid">
+      <div><label for="floor">Floor / level</label><input id="floor" placeholder="Basement B1"></div>
+      <div><label for="zone">Zone / row</label><input id="zone" placeholder="Blue Zone B"></div>
+      <div><label for="pillar">Pillar / landmark *</label><input id="pillar" required placeholder="Pillar P3"></div>
+      <div><label for="locationType">Parking type</label><select id="locationType"><option>Car Parking</option><option>Two Wheeler</option><option>Accessible Parking</option><option>EV Charging</option><option>General Parking</option></select></div>
+     </div>
+     <button type="submit" id="locationSubmit">Save Location & Generate QR</button><button type="button" class="secondary" id="locationReset">Clear</button>
+    </form>
+    <div id="qrResult" class="notice muted" style="margin-top:15px">Save a location to generate its QR code.</div>
+   </section>
   </div>
-  <div id="connection" class="muted">Connecting to Firebase…</div>
-  <div id="message" role="status" aria-live="polite"></div>
-
-  <section class="stats">
-    <div class="stat"><span>Venues</span><strong id="venueCount">—</strong></div>
-    <div class="stat"><span>QR Locations</span><strong id="locationCount">—</strong></div>
-    <div class="stat"><span>Available Slots</span><strong id="availableCount">—</strong></div>
-    <div class="stat"><span>Active Bookings</span><strong id="bookingCount">—</strong></div>
-  </section>
-
-  <div class="grid">
-    <section class="panel">
-      <h2 id="venueFormTitle">＋ Add Venue</h2>
-      <form id="venueForm">
-        <input id="venueEditId" type="hidden">
-        <label for="venueName">Venue name *</label>
-        <input id="venueName" required maxlength="100" placeholder="ESEC Campus Parking">
-        <label for="venueType">Venue type</label>
-        <select id="venueType">
-          <option>College / University</option>
-          <option>Mall</option><option>Hospital</option><option>Office</option>
-          <option>Airport / Railway</option><option>Street Parking</option>
-          <option>Event Ground</option><option>Other</option>
-        </select>
-        <label for="venueCity">City / area</label>
-        <input id="venueCity" maxlength="100" placeholder="Erode">
-        <label for="venueAddress">Address / directions</label>
-        <input id="venueAddress" maxlength="200" placeholder="Main entrance, nearby landmark">
-        <div class="row">
-          <button id="venueSubmit" type="submit">Save Venue</button>
-          <button id="venueReset" class="secondary" type="button" hidden>Cancel Edit</button>
-        </div>
-      </form>
-    </section>
-
-    <section class="panel">
-      <h2 id="locationFormTitle">▦ Create Pillar QR</h2>
-      <form id="locationForm">
-        <input id="locationEditId" type="hidden">
-        <label for="locationVenue">Venue *</label>
-        <select id="locationVenue" required><option value="">Loading venues…</option></select>
-        <label for="floor">Floor / level *</label>
-        <input id="floor" required maxlength="60" placeholder="Basement B2 / Ground Floor">
-        <label for="zone">Zone / row</label>
-        <input id="zone" maxlength="60" placeholder="Blue Zone / Row C">
-        <label for="pillar">Pillar / slot / landmark *</label>
-        <input id="pillar" required maxlength="80" placeholder="Pillar C14">
-        <label for="locationType">Location type</label>
-        <select id="locationType">
-          <option value="pillar">Pillar marker</option>
-          <option value="parking-slot">Parking slot</option>
-          <option value="landmark">Landmark</option>
-          <option value="entrance">Entrance / exit</option>
-        </select>
-        <div class="row">
-          <button id="locationSubmit" type="submit">Save Location & Generate QR</button>
-          <button id="locationReset" class="secondary" type="button" hidden>Cancel Edit</button>
-        </div>
-      </form>
-    </section>
+  <div>
+   <section class="panel"><h3>Venue directory</h3><div id="venueList" class="empty">Loading…</div></section>
+   <section class="panel"><h3>QR location directory</h3><div id="locationList" class="empty">Loading…</div></section>
+   <section class="panel"><h3>Live parking activity</h3><p class="muted">Read-only sensor and booking status.</p><div id="liveSummary" class="empty">Waiting for Firebase…</div></section>
   </div>
-
-  <section class="panel">
-    <h2>Venue Directory</h2>
-    <div id="venueList" class="empty">Loading venues…</div>
-  </section>
-
-  <section class="panel">
-    <h2>Location / Pillar Directory</h2>
-    <p class="muted small">Each QR contains a Consumer Dashboard URL and a Firebase location ID, not just text to copy.</p>
-    <div id="locationList" class="empty">Loading locations…</div>
-  </section>
-
-  <section class="panel">
-    <h2>Generated QR Code</h2>
-    <div id="qrResult" class="empty">Choose “View QR” on a saved location.</div>
-  </section>
-
-  <section class="panel">
-    <h2>Live Parking & Booking Overview</h2>
-    <p class="muted small">Sensor occupancy and booking state are displayed separately.</p>
-    <div id="liveOverview" class="empty">Waiting for Firebase records…</div>
-  </section>
+ </div>
+ <p class="small">Firebase access requires Anonymous Authentication and Realtime Database Rules that permit the relevant reads and writes.</p>
 </main>
-<footer>ParkSmart IoT · Admin prototype · Shared Firebase Realtime Database</footer>
-</div>
-
 <script type="module">
-import {initializeApp} from "https://www.gstatic.com/firebasejs/13.0.0/firebase-app.js";
-import {getAuth,signInAnonymously} from "https://www.gstatic.com/firebasejs/13.0.0/firebase-auth.js";
-import {getDatabase,ref,onValue,push,set,update,remove,get} from "https://www.gstatic.com/firebasejs/13.0.0/firebase-database.js";
-
-const firebaseConfig={
-  apiKey:"AIzaSyAsffyVnKES_-tZz3pnuojPLPFBk3TJe5E",
-  authDomain:"smartpark-9ecbb.firebaseapp.com",
-  databaseURL:"https://smartpark-9ecbb-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId:"smartpark-9ecbb",
-  storageBucket:"smartpark-9ecbb.firebasestorage.app",
-  messagingSenderId:"423958538578",
-  appId:"1:423958538578:web:b7c5395f8348e3a00f728b"
-};
-
-const app=initializeApp(firebaseConfig);
-const auth=getAuth(app);
-const db=getDatabase(app);
-const $=id=>document.getElementById(id);
-
-let venues={},locations={},slots={},bookings={};
-let ready=false;
-let activeQrId=null;
-
-function escapeHtml(value){
-  return String(value??"").replace(/[&<>"']/g,c=>({
-    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
-  }[c]));
+import{initializeApp}from"https://www.gstatic.com/firebasejs/13.0.0/firebase-app.js";
+import{getAuth,signInAnonymously}from"https://www.gstatic.com/firebasejs/13.0.0/firebase-auth.js";
+import{getDatabase,ref,onValue,push,set,update,remove}from"https://www.gstatic.com/firebasejs/13.0.0/firebase-database.js";
+const cfg={apiKey:"AIzaSyAsffyVnKES_-tZz3pnuojPLPFBk3TJe5E",authDomain:"smartpark-9ecbb.firebaseapp.com",databaseURL:"https://smartpark-9ecbb-default-rtdb.asia-southeast1.firebasedatabase.app",projectId:"smartpark-9ecbb",storageBucket:"smartpark-9ecbb.firebasestorage.app",messagingSenderId:"423958538578",appId:"1:423958538578:web:b7c5395f8348e3a00f728b"};
+const app=initializeApp(cfg),auth=getAuth(app),db=getDatabase(app),$=id=>document.getElementById(id);
+let uid=null,venues={},locations={},slots={},bookings={};
+const esc=x=>String(x??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+function status(v){if(v&&typeof v==="object")v=v.status??v.state??v.occupancy??v.value;let s=String(v??"").toUpperCase();if(["AVAILABLE","FREE","EMPTY","0"].includes(s))return"AVAILABLE";if(["OCCUPIED","FULL","1"].includes(s))return"OCCUPIED";return"UNKNOWN"}
+function active(b){return!!b&&["ACTIVE","BOOKED"].includes(String(b.status||"").toUpperCase())}
+function message(s,ok=false){$("connection").textContent=s;$("connection").style.color=ok?"var(--green)":"var(--amber)"}
+function render(){
+ $("venueCount").textContent=Object.keys(venues).length;$("locationCount").textContent=Object.keys(locations).length;
+ $("availableCount").textContent=Object.values(slots).filter(v=>status(v)==="AVAILABLE").length;
+ $("bookingCount").textContent=Object.values(bookings).filter(active).length;
+ const old=$("venueSelect").value;
+ $("venueSelect").innerHTML='<option value="">Choose venue</option>'+Object.entries(venues).map(([id,v])=>`<option value="${esc(id)}">${esc(v.name)}</option>`).join("");
+ if(venues[old])$("venueSelect").value=old;
+ $("venueList").innerHTML=Object.entries(venues).map(([id,v])=>`<div class="item"><strong>${esc(v.name)}</strong><div class="muted">${esc(v.type)} · ${esc(v.city)}</div><div class="muted">${esc(v.address)}</div><button class="secondary" data-ve="${esc(id)}">Edit</button><button class="danger" data-vd="${esc(id)}">Delete</button></div>`).join("")||'<div class="empty">No venues yet. Register the first venue.</div>';
+ $("locationList").innerHTML=Object.entries(locations).map(([id,l])=>`<div class="item"><strong>${esc(l.venueName||venues[l.venueId]?.name||"Parking location")}</strong><div>${esc([l.floor,l.zone,l.pillar,l.locationType].filter(Boolean).join(" · "))}</div><div class="small">Location ID: ${esc(id)}</div><button data-lq="${esc(id)}">View QR</button><button class="secondary" data-le="${esc(id)}">Edit</button><button class="danger" data-ld="${esc(id)}">Delete</button></div>`).join("")||'<div class="empty">No locations yet.</div>';
+ $("liveSummary").innerHTML=Object.entries(slots).map(([id,v])=>`<div class="item"><strong>${esc(id)}</strong> · <span class="${status(v)==="AVAILABLE"?"good":status(v)==="OCCUPIED"?"bad":"warn"}">${esc(status(v))}</span><div class="muted">Booking: ${active(bookings[id])?"Active":"None"}</div></div>`).join("")||'<div class="empty">No slot sensor data received yet.</div>';
+ document.querySelectorAll("[data-ve]").forEach(b=>b.onclick=()=>editVenue(b.dataset.ve));
+ document.querySelectorAll("[data-vd]").forEach(b=>b.onclick=()=>deleteVenue(b.dataset.vd));
+ document.querySelectorAll("[data-lq]").forEach(b=>b.onclick=()=>showQR(b.dataset.lq));
+ document.querySelectorAll("[data-le]").forEach(b=>b.onclick=()=>editLocation(b.dataset.le));
+ document.querySelectorAll("[data-ld]").forEach(b=>b.onclick=()=>deleteLocation(b.dataset.ld));
 }
-function say(text,type=""){
-  $("message").textContent=text;
-  $("message").className=type;
-}
-function values(obj){return Object.entries(obj||{}).map(([id,data])=>({id,...(data||{})}));}
-function sensorState(value){
-  let raw=value;
-  if(value&&typeof value==="object") raw=value.status??value.state??value.occupancy;
-  raw=String(raw??"").trim().toUpperCase();
-  if(["AVAILABLE","FREE","EMPTY","0","FALSE"].includes(raw))return "AVAILABLE";
-  if(["OCCUPIED","FULL","1","TRUE"].includes(raw))return "OCCUPIED";
-  return "UNKNOWN";
-}
-function activeBooking(value){
-  return !!value && ["ACTIVE","BOOKED"].includes(String(value.status||"").toUpperCase());
-}
-function venueName(id){
-  return venues[id]?.name || locations[id]?.venueName || "Unknown venue";
-}
-function renderVenueSelect(selected=""){
-  const list=values(venues);
-  $("locationVenue").innerHTML='<option value="">Choose venue</option>'+
-    list.map(v=>`<option value="${escapeHtml(v.id)}">${escapeHtml(v.name)}</option>`).join("");
-  if(selected && venues[selected])$("locationVenue").value=selected;
-}
-function renderStats(){
-  $("venueCount").textContent=values(venues).length;
-  $("locationCount").textContent=values(locations).length;
-  const slotIds=["slot1","slot2","slot3","slot4"];
-  $("availableCount").textContent=slotIds.filter(id=>
-    sensorState(slots[id])==="AVAILABLE"&&!activeBooking(bookings[id])
-  ).length;
-  $("bookingCount").textContent=values(bookings).filter(activeBooking).length;
-}
-function renderVenues(){
-  const list=values(venues);
-  $("venueList").innerHTML=list.length?list.map(v=>`
-    <article class="item">
-      <div class="item-head">
-        <div><strong>${escapeHtml(v.name)}</strong>
-          <div class="muted small">${escapeHtml(v.type||"Venue")} · ${escapeHtml(v.city||"Area not specified")}</div>
-          <div class="muted small">${escapeHtml(v.address||"")}</div>
-        </div>
-        <span class="pill">Saved</span>
-      </div>
-      <div class="row">
-        <button class="secondary" data-edit-venue="${escapeHtml(v.id)}">Edit</button>
-        <button class="danger" data-delete-venue="${escapeHtml(v.id)}">Delete</button>
-      </div>
-    </article>`).join(""):'<div class="empty">No venues yet. Add your first venue above.</div>';
-}
-function renderLocations(){
-  const list=values(locations).sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
-  $("locationList").innerHTML=list.length?list.map(l=>`
-    <article class="item">
-      <div class="item-head">
-        <div>
-          <strong>${escapeHtml(l.pillar||"Unnamed location")}</strong>
-          <div class="muted small">${escapeHtml(l.venueName||venueName(l.venueId))}</div>
-          <div class="muted small">${escapeHtml([l.floor,l.zone,l.pillar].filter(Boolean).join(" · "))}</div>
-          <div class="muted small">Type: ${escapeHtml(l.locationType||"pillar")}</div>
-        </div>
-        <span class="pill">QR ready</span>
-      </div>
-      <div class="row">
-        <button data-view-qr="${escapeHtml(l.id)}">View QR</button>
-        <button class="secondary" data-edit-location="${escapeHtml(l.id)}">Edit</button>
-        <button class="danger" data-delete-location="${escapeHtml(l.id)}">Delete</button>
-      </div>
-    </article>`).join(""):'<div class="empty">No locations yet. Create a pillar location above.</div>';
-}
-function renderLive(){
-  const ids=["slot1","slot2","slot3","slot4"];
-  $("liveOverview").innerHTML=ids.map(id=>{
-    const sensor=sensorState(slots[id]);
-    const booking=bookings[id];
-    const booked=activeBooking(booking);
-    const overall=sensor==="OCCUPIED"||booked?"OCCUPIED":sensor;
-    const pill=overall==="AVAILABLE"?"pill":overall==="OCCUPIED"?"pill bad":"pill warn";
-    return `<article class="item">
-      <div class="item-head">
-        <strong>${id.replace("slot","Slot ")}</strong>
-        <span class="${pill}">${overall}</span>
-      </div>
-      <div class="muted small">Sensor: ${sensor}</div>
-      <div class="muted small">Booking: ${booked?"ACTIVE":"None"}</div>
-      ${booked?`<div class="muted small">Name: ${escapeHtml(booking.name||"Not provided")} · Vehicle: ${escapeHtml(booking.vehicle||"Not provided")}</div>`:""}
-    </article>`;
-  }).join("");
-  renderStats();
-}
-function renderAll(){
-  renderVenueSelect($("locationVenue").value);
-  renderVenues();
-  renderLocations();
-  renderLive();
-}
-function resetVenueForm(){
-  $("venueForm").reset();$("venueEditId").value="";
-  $("venueFormTitle").textContent="＋ Add Venue";
-  $("venueSubmit").textContent="Save Venue";$("venueReset").hidden=true;
-}
-function resetLocationForm(){
-  $("locationForm").reset();$("locationEditId").value="";
-  $("locationFormTitle").textContent="▦ Create Pillar QR";
-  $("locationSubmit").textContent="Save Location & Generate QR";
-  $("locationReset").hidden=true;
-  renderVenueSelect();
-}
-function showQr(id){
-  const l=locations[id];
-  if(!l){say("This location record no longer exists.","error");return;}
-  activeQrId=id;
-  const url=new URL("./consumer.html",window.location.href);
-  url.searchParams.set("locationId",id);
-  const target=url.href;
-  const qrUrl="https://api.qrserver.com/v1/create-qr-code/?size=300x300&data="+encodeURIComponent(target);
-  $("qrResult").innerHTML=`
-    <div class="qrbox">
-      <img id="qrImage" src="${qrUrl}" alt="QR code for ${escapeHtml(l.pillar)}">
-      <h3>${escapeHtml(l.venueName||venueName(l.venueId))}</h3>
-      <p>${escapeHtml([l.floor,l.zone,l.pillar].filter(Boolean).join(" · "))}</p>
-      <p class="muted small">Location ID: <code>${escapeHtml(id)}</code></p>
-      <label>QR destination URL</label>
-      <input id="qrTarget" readonly value="${escapeHtml(target)}">
-      <div class="row">
-        <button id="copyLink" type="button">Copy link</button>
-        <button id="openLink" type="button" class="secondary">Test link</button>
-        <button id="printQr" type="button" class="secondary">Print QR</button>
-        <button id="downloadQr" type="button" class="secondary">Open QR image</button>
-      </div>
-      <p class="muted small">Print and attach this QR to the matching pillar. A phone camera scan opens the Consumer Dashboard link; internet is required.</p>
-    </div>`;
-  $("copyLink").onclick=async()=>{
-    try{await navigator.clipboard.writeText(target);say("Consumer link copied.","success");}
-    catch{ $("qrTarget").select();say("Select and copy the URL shown above.","");}
-  };
-  $("openLink").onclick=()=>window.open(target,"_blank","noopener");
-  $("printQr").onclick=()=>{
-    const w=window.open("","_blank");
-    if(!w){say("Allow pop-ups to print the QR.","error");return;}
-    w.document.write(`<!doctype html><html><head><title>ParkSmart QR</title></head><body style="font-family:Arial;text-align:center"><h2>${escapeHtml(l.venueName||venueName(l.venueId))}</h2><h3>${escapeHtml([l.floor,l.zone,l.pillar].filter(Boolean).join(" · "))}</h3><img style="width:300px" src="${qrUrl}"><p>Scan to open ParkSmart parking location</p><p>${escapeHtml(target)}</p></body></html>`);
-    w.document.close();w.focus();w.print();
-  };
-  $("downloadQr").onclick=()=>window.open(qrUrl,"_blank","noopener");
-}
-$("venueForm").addEventListener("submit",async e=>{
-  e.preventDefault();
-  if(!ready)return say("Firebase is not ready yet.","error");
-  const id=$("venueEditId").value;
-  const data={
-    name:$("venueName").value.trim(),
-    type:$("venueType").value,
-    city:$("venueCity").value.trim(),
-    address:$("venueAddress").value.trim(),
-    updatedAt:Date.now()
-  };
-  if(!data.name)return say("Enter a venue name.","error");
-  try{
-    if(id) await update(ref(db,"parksmart/venues/"+id),data);
-    else{
-      const newRef=push(ref(db,"parksmart/venues"));
-      await set(newRef,{...data,createdAt:Date.now(),createdBy:auth.currentUser.uid});
-    }
-    resetVenueForm();say(id?"Venue updated.":"Venue saved to Firebase.","success");
-  }catch(err){say("Venue save failed: "+err.message,"error");}
-});
-$("venueList").addEventListener("click",async e=>{
-  const edit=e.target.closest("[data-edit-venue]");
-  const del=e.target.closest("[data-delete-venue]");
-  if(edit){
-    const v=venues[edit.dataset.editVenue];if(!v)return;
-    $("venueEditId").value=edit.dataset.editVenue;
-    $("venueName").value=v.name||"";$("venueType").value=v.type||"Other";
-    $("venueCity").value=v.city||"";$("venueAddress").value=v.address||"";
-    $("venueFormTitle").textContent="Edit Venue";
-    $("venueSubmit").textContent="Update Venue";$("venueReset").hidden=false;
-    $("venueForm").scrollIntoView({behavior:"smooth",block:"center"});
-  }
-  if(del){
-    const id=del.dataset.deleteVenue;
-    const linked=values(locations).filter(l=>l.venueId===id);
-    if(linked.length)return say("Delete or reassign this venue's "+linked.length+" location(s) first.","error");
-    if(!confirm("Delete this venue?"))return;
-    try{await remove(ref(db,"parksmart/venues/"+id));say("Venue deleted.","success");}
-    catch(err){say("Delete failed: "+err.message,"error");}
-  }
-});
-$("venueReset").onclick=resetVenueForm;
-$("locationForm").addEventListener("submit",async e=>{
-  e.preventDefault();
-  if(!ready)return say("Firebase is not ready yet.","error");
-  const editId=$("locationEditId").value;
-  const venueId=$("locationVenue").value;
-  const venue=venues[venueId];
-  if(!venue)return say("Select a saved venue first.","error");
-  const data={
-    venueId,venueName:venue.name,
-    floor:$("floor").value.trim(),
-    zone:$("zone").value.trim(),
-    pillar:$("pillar").value.trim(),
-    locationType:$("locationType").value,
-    updatedAt:Date.now()
-  };
-  if(!data.floor||!data.pillar)return say("Floor and pillar/location are required.","error");
-  try{
-    let id=editId;
-    if(id){
-      await update(ref(db,"parksmart/locations/"+id),data);
-    }else{
-      const newRef=push(ref(db,"parksmart/locations"));
-      id=newRef.key;
-      await set(newRef,{...data,createdAt:Date.now(),createdBy:auth.currentUser.uid});
-    }
-    resetLocationForm();say(editId?"Location updated.":"Location saved. QR destination created.","success");
-    showQr(id);
-  }catch(err){say("Location save failed: "+err.message,"error");}
-});
-$("locationList").addEventListener("click",async e=>{
-  const view=e.target.closest("[data-view-qr]");
-  const edit=e.target.closest("[data-edit-location]");
-  const del=e.target.closest("[data-delete-location]");
-  if(view)showQr(view.dataset.viewQr);
-  if(edit){
-    const id=edit.dataset.editLocation,l=locations[id];if(!l)return;
-    $("locationEditId").value=id;
-    renderVenueSelect(l.venueId);
-    $("floor").value=l.floor||"";$("zone").value=l.zone||"";
-    $("pillar").value=l.pillar||"";
-    $("locationType").value=l.locationType||"pillar";
-    $("locationFormTitle").textContent="Edit Location";
-    $("locationSubmit").textContent="Update Location";
-    $("locationReset").hidden=false;
-    $("locationForm").scrollIntoView({behavior:"smooth",block:"center"});
-  }
-  if(del){
-    const id=del.dataset.deleteLocation;
-    if(!confirm("Delete this location and invalidate its QR link?"))return;
-    try{
-      await remove(ref(db,"parksmart/locations/"+id));
-      if(activeQrId===id){activeQrId=null;$("qrResult").textContent="Location deleted.";}
-      say("Location deleted from Firebase.","success");
-    }catch(err){say("Delete failed: "+err.message,"error");}
-  }
-});
-$("locationReset").onclick=resetLocationForm;
-
-try{
-  await signInAnonymously(auth);
-  ready=true;
-  $("connection").textContent="● Firebase connected";
-  $("connection").className="success";
-  onValue(ref(db,".info/connected"),s=>{
-    $("connection").textContent=s.val()===true?"● Firebase connected":"○ Reconnecting to Firebase…";
-    $("connection").className=s.val()===true?"success":"muted";
-  });
-  onValue(ref(db,"parksmart/venues"),s=>{venues=s.val()||{};renderAll();},
-    err=>say("Cannot read venues: "+err.message,"error"));
-  onValue(ref(db,"parksmart/locations"),s=>{locations=s.val()||{};renderAll();},
-    err=>say("Cannot read locations: "+err.message,"error"));
-  onValue(ref(db,"parksmart/slots"),s=>{slots=s.val()||{};renderLive();},
-    err=>say("Cannot read sensors: "+err.message,"error"));
-  onValue(ref(db,"parksmart/bookings"),s=>{bookings=s.val()||{};renderLive();},
-    err=>say("Cannot read bookings: "+err.message,"error"));
-}catch(err){
-  $("connection").textContent="Firebase setup required";
-  $("connection").className="error";
-  say("Connection failed: "+err.message+". Check internet, Anonymous Authentication and Realtime Database Rules.","error");
-}
+function resetVenue(){$("venueForm").reset();$("venueEditId").value="";$("venueHeading").textContent="＋ Register a venue";$("venueSubmit").textContent="Save Venue"}
+function resetLocation(){$("locationForm").reset();$("locationEditId").value="";$("locationHeading").textContent="▦ Create parking QR location";$("locationSubmit").textContent="Save Location & Generate QR"}
+$("venueReset").onclick=resetVenue;$("locationReset").onclick=resetLocation;
+$("venueForm").onsubmit=async e=>{e.preventDefault();if(!uid)return alert("Firebase not connected.");const id=$("venueEditId").value;const data={name:$("venueName").value.trim(),type:$("venueType").value,city:$("venueCity").value.trim(),address:$("venueAddress").value.trim(),updatedAt:Date.now()};try{if(id)await update(ref(db,"parksmart/venues/"+id),data);else{data.createdAt=Date.now();await set(push(ref(db,"parksmart/venues")),data)}resetVenue();alert("Venue saved.");}catch(err){alert("Save failed: "+err.message+". Check Firebase Rules.")}};
+function editVenue(id){let v=venues[id];if(!v)return;$("venueEditId").value=id;$("venueName").value=v.name||"";$("venueType").value=v.type||"Other";$("venueCity").value=v.city||"";$("venueAddress").value=v.address||"";$("venueHeading").textContent="Edit venue";$("venueSubmit").textContent="Update Venue";window.scrollTo({top:0,behavior:"smooth"})}
+async function deleteVenue(id){if(Object.values(locations).some(l=>l.venueId===id))return alert("Delete this venue's locations first.");if(!confirm("Delete this venue?"))return;try{await remove(ref(db,"parksmart/venues/"+id))}catch(e){alert(e.message)}}
+$("locationForm").onsubmit=async e=>{e.preventDefault();if(!uid)return alert("Firebase not connected.");const venueId=$("venueSelect").value,v=venues[venueId];if(!v)return alert("Choose a venue.");const id=$("locationEditId").value;const data={venueId,venueName:v.name,floor:$("floor").value.trim(),zone:$("zone").value.trim(),pillar:$("pillar").value.trim(),locationType:$("locationType").value,updatedAt:Date.now()};try{let locationId=id;if(id)await update(ref(db,"parksmart/locations/"+id),data);else{const r=push(ref(db,"parksmart/locations"));locationId=r.key;data.createdAt=Date.now();await set(r,data)}resetLocation();showQR(locationId)}catch(err){alert("Location save failed: "+err.message+". Check Firebase Rules.")}};
+function editLocation(id){const l=locations[id];if(!l)return;$("locationEditId").value=id;$("venueSelect").value=l.venueId||"";$("floor").value=l.floor||"";$("zone").value=l.zone||"";$("pillar").value=l.pillar||"";$("locationType").value=l.locationType||"Car Parking";$("locationHeading").textContent="Edit parking location";$("locationSubmit").textContent="Update Location";window.scrollTo({top:0,behavior:"smooth"})}
+async function deleteLocation(id){if(!confirm("Delete this location? Existing QR codes will stop resolving."))return;try{await remove(ref(db,"parksmart/locations/"+id))}catch(e){alert(e.message)}}
+function showQR(id){const l=locations[id];if(!l)return;const url=new URL("./consumer.html",location.href);url.searchParams.set("locationId",id);const link=url.href,qr="https://api.qrserver.com/v1/create-qr-code/?size=240x240&data="+encodeURIComponent(link);$("qrResult").innerHTML=`<strong>${esc(l.venueName||venues[l.venueId]?.name)} · ${esc(l.pillar)}</strong><p class="muted">${esc([l.floor,l.zone,l.locationType].filter(Boolean).join(" · "))}</p><div class="qrbox"><img src="${qr}" alt="Parking QR"></div><div class="notice"><a href="${esc(link)}" target="_blank" rel="noopener">${esc(link)}</a></div><button id="copyQR">Copy link</button><button class="secondary" id="testQR">Test link</button><button class="secondary" id="printQR">Print QR</button>`;$("copyQR").onclick=async()=>{try{await navigator.clipboard.writeText(link);alert("Link copied.")}catch{prompt("Copy this link",link)}};$("testQR").onclick=()=>window.open(link,"_blank","noopener");$("printQR").onclick=()=>{const w=window.open("","_blank");if(!w)return alert("Allow pop-ups to print.");w.document.write(`<title>ParkSmart QR</title><body style="font-family:Arial;text-align:center;padding:25px"><h2>${esc(l.venueName)}</h2><p>${esc([l.floor,l.zone,l.pillar].filter(Boolean).join(" · "))}</p><img width="260" src="${qr}"><p>${esc(link)}</p><script>window.onload=()=>window.print()<\/script>`);w.document.close()}}
+try{const c=await signInAnonymously(auth);uid=c.user.uid;message("Firebase connected",true);
+onValue(ref(db,"parksmart/venues"),s=>{venues=s.val()||{};render()},e=>message("Venue access error: "+e.message));
+onValue(ref(db,"parksmart/locations"),s=>{locations=s.val()||{};render()},e=>message("Location access error: "+e.message));
+onValue(ref(db,"parksmart/slots"),s=>{slots=s.val()||{};render()},e=>message("Sensor access error: "+e.message));
+onValue(ref(db,"parksmart/bookings"),s=>{bookings=s.val()||{};render()},e=>message("Booking access error: "+e.message));
+}catch(e){message("Firebase error: "+e.message);$("liveSummary").innerHTML='<span class="bad">Check Anonymous Authentication, internet and database rules.</span>'}
 </script>
 </body>
 </html>
