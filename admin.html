@@ -4,114 +4,203 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>ParkSmart | Hardware Dashboard</title>
+<title>ParkSmart | Admin Dashboard</title>
 <style>
-:root{color-scheme:dark;--bg:#0b1220;--panel:#192840;--line:#2a3a54;--text:#eef5ff;--muted:#9fb0c8;--green:#4ade80;--red:#fb7185;--amber:#fbbf24}
+:root{
+  --bg:#081321;--panel:#13243a;--line:#29415d;
+  --text:#f2f7ff;--muted:#9fb2c9;
+  --green:#4ade80;--red:#fb7185;--amber:#fbbf24;--blue:#38bdf8;
+}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--text);font:15px/1.5 Arial,sans-serif}
-.wrap{max-width:1100px;margin:auto;padding:24px 16px}
+.wrap{max-width:1250px;margin:auto;padding:22px 15px}
 header{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:22px}
-h1{margin:0;font-size:30px}h2{font-size:20px;margin:0 0 14px}
-.muted{color:var(--muted)}.small{font-size:12px}
-.connection,.pill{border-radius:20px;padding:7px 12px;background:#23344d;font-size:12px}
-.ok{color:var(--green)}.bad{color:var(--red)}
-.stats{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:18px}
-.stat,.card{background:var(--panel);border:1px solid var(--line);border-radius:15px;padding:17px}
-.num{font-size:27px;font-weight:bold;margin-top:5px}
-.layout{display:grid;grid-template-columns:1.5fr .8fr;gap:16px}
-.slot-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
-.slot,.gate{background:#0e192b;border:1px solid var(--line);border-radius:12px;padding:15px}
-.slot-top{display:flex;justify-content:space-between;gap:8px;align-items:center}
-.slot-icon{font-size:30px;margin:12px 0 5px}
-.available{background:#143726;color:var(--green)}
-.occupied{background:#3b1d2a;color:var(--red)}
-.reserved{background:#3b3018;color:var(--amber)}
-.unknown{background:#333044;color:var(--amber)}
-.source{font-size:12px;color:var(--muted);margin-top:7px}
-.gate-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.gate-value{font-weight:bold;margin-top:8px;overflow-wrap:anywhere}
-.booking-row{padding:12px 0;border-bottom:1px solid var(--line)}
-.note{background:#12243a;border:1px solid #24445e;padding:13px;border-radius:12px;margin-top:15px;font-size:13px}
-button{padding:11px 15px;border:0;border-radius:9px;background:#293a53;color:white;cursor:pointer}
-.message{font-size:13px;margin-top:10px;overflow-wrap:anywhere}
-footer{text-align:center;color:var(--muted);font-size:12px;margin-top:25px}
-@media(max-width:800px){.layout{grid-template-columns:1fr}.stats{grid-template-columns:repeat(3,1fr)}}
-@media(max-width:500px){.stats{grid-template-columns:repeat(2,1fr)}.slot-grid{grid-template-columns:1fr}}
+h1{margin:0;font-size:29px}
+h2{font-size:20px;margin:0 0 14px}
+h3{font-size:16px}
+.muted{color:var(--muted)}
+.small{font-size:12px}
+.panel,.stat{background:var(--panel);border:1px solid var(--line);border-radius:15px;padding:18px}
+.panel{margin-bottom:16px}
+.stats{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:16px}
+.stat strong{display:block;font-size:27px;margin-top:5px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:15px}
+input,select{
+  width:100%;padding:11px;margin:6px 0 12px;
+  border:1px solid var(--line);border-radius:8px;
+  background:#09182a;color:var(--text)
+}
+label{font-size:13px;color:var(--muted)}
+button{
+  padding:10px 14px;border:0;border-radius:8px;
+  background:#087dcc;color:white;font-weight:bold;cursor:pointer;margin:4px 3px 4px 0
+}
+button.secondary{background:#34465e}
+button.danger{background:#a8324b}
+button:disabled{opacity:.5;cursor:not-allowed}
+.badge{display:inline-block;padding:5px 10px;border-radius:20px;background:#26384f;font-size:12px}
+.available{color:var(--green)}
+.occupied{color:var(--red)}
+.reserved{color:var(--amber)}
+.unknown{color:var(--amber)}
+.row{padding:12px 0;border-bottom:1px solid var(--line);overflow-wrap:anywhere}
+.row:last-child{border-bottom:0}
+.slotgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.slot{padding:13px;background:#09182a;border:1px solid var(--line);border-radius:10px}
+#loginPanel{max-width:460px;margin:70px auto;text-align:center}
+#app{display:none}
+#qrImage{max-width:210px;width:100%;background:white;padding:10px;border-radius:10px}
+.note{padding:12px;background:#102d40;border:1px solid #28516a;border-radius:10px;font-size:13px}
+.hidden{display:none}
+@media(max-width:850px){.stats{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:600px){.grid{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}}
 </style>
 </head>
 <body>
 <main class="wrap">
-<header>
- <div>
+
+<section id="loginPanel" class="panel">
   <h1>🅿️ ParkSmart</h1>
-  <div class="muted">Hardware Dashboard · ESP32 Monitoring</div>
- </div>
- <div id="connection" class="connection">Connecting…</div>
+  <h2>Admin Login</h2>
+  <p class="muted">Sign in using your authorized Google account.</p>
+  <button id="loginBtn">Sign in with Google</button>
+  <p id="loginMessage" class="small"></p>
+</section>
+
+<section id="app">
+<header>
+  <div>
+    <h1>🅿️ ParkSmart Admin</h1>
+    <div class="muted">Venue · QR · Occupancy · Booking Management</div>
+  </div>
+  <div>
+    <span id="connection" class="badge">Connecting…</span>
+    <button id="logoutBtn" class="secondary">Logout</button>
+  </div>
 </header>
 
+<div class="note">
+  <strong>Admin workspace</strong><br>
+  Physical sensor status is displayed separately from booking status.
+  A physically occupied slot always remains OCCUPIED.
+</div>
+
 <section class="stats">
- <div class="stat"><div class="muted">Total Slots</div><div class="num">4</div></div>
- <div class="stat"><div class="muted">Available</div><div class="num" id="availableCount">—</div></div>
- <div class="stat"><div class="muted">Occupied</div><div class="num" id="occupiedCount">—</div></div>
- <div class="stat"><div class="muted">Reserved</div><div class="num" id="reservedCount">—</div></div>
- <div class="stat"><div class="muted">Active Bookings</div><div class="num" id="bookingCount">—</div></div>
+  <div class="stat"><span class="muted">Total Slots</span><strong>4</strong></div>
+  <div class="stat"><span class="muted">Available</span><strong id="availableCount">—</strong></div>
+  <div class="stat"><span class="muted">Occupied</span><strong id="occupiedCount">—</strong></div>
+  <div class="stat"><span class="muted">Reserved</span><strong id="reservedCount">—</strong></div>
+  <div class="stat"><span class="muted">Active Bookings</span><strong id="bookingCount">—</strong></div>
 </section>
 
-<section class="layout">
- <div>
-  <div class="card">
-   <h2>🅿️ Live Parking Slots</h2>
-   <p class="muted small">Physical sensor status and booking status are displayed separately.</p>
-   <div id="slotGrid" class="slot-grid" style="margin-top:15px">
-    <p class="muted">Waiting for Firebase data…</p>
-   </div>
-  </div>
-
-  <div class="card" style="margin-top:16px">
-   <h2>🚦 Entry & Exit Monitoring</h2>
-   <div class="gate-grid">
-    <div class="gate">
-     <div class="muted small">ENTRY</div>
-     <div id="entryStatus" class="gate-value">Waiting…</div>
-    </div>
-    <div class="gate">
-     <div class="muted small">EXIT</div>
-     <div id="exitStatus" class="gate-value">Waiting…</div>
-    </div>
-   </div>
-   <p class="muted small">Displays the latest values received from Firebase.</p>
-  </div>
- </div>
-
- <aside>
-  <div class="card">
-   <h2>📋 Active Bookings</h2>
-   <div id="bookingList" class="muted">Waiting for booking data…</div>
-  </div>
-  <div class="note">
-   <strong>Hardware Mode – Read Only</strong><br><br>
-   Bookings are created and cancelled only in Consumer Dashboard.
-   This dashboard only monitors ESP32 sensor and Firebase data.
-   An AVAILABLE sensor with an active booking is shown as RESERVED.
-  </div>
-  <div class="card" style="margin-top:15px">
-   <button id="refreshButton">Refresh Status</button>
-   <div id="message" class="message"></div>
-  </div>
- </aside>
+<div class="grid">
+<section class="panel">
+  <h2>🏢 Add Parking Venue</h2>
+  <form id="venueForm">
+    <label>Venue Name</label>
+    <input id="venueName" placeholder="Example: ESEC College" required>
+    <label>Venue Address</label>
+    <input id="venueAddress" placeholder="Enter address">
+    <label>Number of Slots</label>
+    <input id="venueSlots" type="number" min="1" max="500" value="4" required>
+    <button type="submit">＋ Add Venue</button>
+  </form>
+  <div id="venueList" class="muted">No venues loaded.</div>
 </section>
-<footer>ParkSmart Prototype · ESP32 + Firebase Realtime Database</footer>
+
+<section class="panel">
+  <h2>📍 Create QR Parking Location</h2>
+  <form id="locationForm">
+    <label>Select Venue</label>
+    <select id="locationVenue" required>
+      <option value="">Select venue</option>
+    </select>
+    <label>Floor / Level</label>
+    <input id="floor" placeholder="Example: Ground Floor">
+    <label>Zone / Section</label>
+    <input id="zone" placeholder="Example: Zone A">
+    <label>Pillar / Slot / Location Label</label>
+    <input id="pillar" placeholder="Example: P4 or Slot 4" required>
+    <label>Location Type</label>
+    <select id="locationType">
+      <option value="Parking Slot">Parking Slot</option>
+      <option value="Parking Area">Parking Area</option>
+      <option value="Floor">Floor</option>
+      <option value="Other">Other</option>
+    </select>
+    <button type="submit">Generate QR Location</button>
+  </form>
+  <div id="qrResult" class="hidden">
+    <p id="qrDescription"></p>
+    <img id="qrImage" alt="Parking location QR code">
+    <p><a id="qrLink" target="_blank" rel="noopener">Open QR destination</a></p>
+    <button id="downloadQr" type="button">Download QR</button>
+  </div>
+</section>
+</div>
+
+<section class="panel">
+  <h2>📡 Live Hardware Monitoring – ESEC Demo</h2>
+  <p class="muted small">Live sensor data from /parksmart/slots</p>
+  <div id="slotGrid" class="slotgrid">Waiting for sensor data…</div>
+  <div class="grid" style="margin-top:14px">
+    <div class="slot">
+      <strong>Entry Sensor / Gate</strong>
+      <div id="entryStatus" class="muted">Waiting…</div>
+    </div>
+    <div class="slot">
+      <strong>Exit Sensor / Gate</strong>
+      <div id="exitStatus" class="muted">Waiting…</div>
+    </div>
+  </div>
+</section>
+
+<div class="grid">
+<section class="panel">
+  <h2>📋 Booking Management</h2>
+  <div id="bookingList" class="muted">Waiting for bookings…</div>
+</section>
+
+<section class="panel">
+  <h2>🕘 Booking History</h2>
+  <div id="historyList" class="muted">Waiting for history…</div>
+</section>
+</div>
+
+<section class="panel">
+  <h2>📍 Saved QR Locations</h2>
+  <div id="locationList" class="muted">No locations loaded.</div>
+</section>
+
+<section class="panel">
+  <h2>📊 Basic Report</h2>
+  <div id="report">
+    <p>Active bookings: <strong id="reportActive">—</strong></p>
+    <p>Cancelled bookings: <strong id="reportCancelled">—</strong></p>
+    <p>Total booking records: <strong id="reportTotal">—</strong></p>
+  </div>
+</section>
+
+<p id="message" class="small"></p>
+</section>
 </main>
 
 <script type="module">
-import {initializeApp} from
-"https://www.gstatic.com/firebasejs/13.0.0/firebase-app.js";
-import {getAuth,signInAnonymously} from
-"https://www.gstatic.com/firebasejs/13.0.0/firebase-auth.js";
-import {getDatabase,ref,onValue,get} from
-"https://www.gstatic.com/firebasejs/13.0.0/firebase-database.js";
+import {initializeApp}
+ from "https://www.gstatic.com/firebasejs/13.0.0/firebase-app.js";
 
-const firebaseConfig={
+import {
+ getAuth,GoogleAuthProvider,signInWithPopup,onAuthStateChanged,signOut
+} from "https://www.gstatic.com/firebasejs/13.0.0/firebase-auth.js";
+
+import {
+ getDatabase,ref,onValue,push,set,get
+} from "https://www.gstatic.com/firebasejs/13.0.0/firebase-database.js";
+
+/* IMPORTANT: Replace this with your own Google account email. */
+const ADMIN_EMAIL = "hackingthor47@gmail.com";
+
+const firebaseConfig = {
  apiKey:"AIzaSyAsffyVnKES_-tZz3pnuojPLPFBk3TJe5",
  authDomain:"smartpark-9ecbb.firebaseapp.com",
  databaseURL:"https://smartpark-9ecbb-default-rtdb.asia-southeast1.firebasedatabase.app",
@@ -124,166 +213,321 @@ const firebaseConfig={
 const app=initializeApp(firebaseConfig);
 const auth=getAuth(app);
 const db=getDatabase(app);
-const ids=["slot1","slot2","slot3","slot4"];
+const provider=new GoogleAuthProvider();
+provider.setCustomParameters({prompt:"select_account"});
+
 const $=id=>document.getElementById(id);
+const slotIds=["slot1","slot2","slot3","slot4"];
 
-let slots={},bookings={};
+let slots={};
+let bookings={};
+let venues={};
+let locations={};
+let lastQrUrl="";
 
-function escapeHTML(value){
- return String(value??"").replace(/[&<>"']/g,c=>({
- "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+function esc(v){
+ return String(v??"").replace(/[&<>"']/g,c=>({
+  "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
  }[c]));
 }
 
+function say(text){
+ $("message").textContent=text;
+}
+
 function physicalStatus(id){
- let value=slots[id];
- if(value && typeof value==="object"){
-  value=value.status??value.state??value.occupancy??value.value;
+ let v=slots[id];
+ if(v&&typeof v==="object"){
+  v=v.status??v.state??v.occupancy??v.value;
  }
- const s=String(value??"").trim().toUpperCase();
+ const s=String(v??"").trim().toUpperCase();
  if(["AVAILABLE","FREE","EMPTY","0","FALSE"].includes(s))return "AVAILABLE";
  if(["OCCUPIED","FULL","1","TRUE"].includes(s))return "OCCUPIED";
  return "UNKNOWN";
 }
 
-function isActiveBooking(b){
- return !!b && ["ACTIVE","BOOKED"].includes(
+function active(b){
+ return !!b&&["ACTIVE","BOOKED"].includes(
   String(b.status||"").toUpperCase()
  );
 }
 
-function render(){
- let available=0,occupied=0,reserved=0,activeBookings=0;
+function bookingStatus(id){
+ const sensor=physicalStatus(id);
+ if(sensor==="OCCUPIED")return "OCCUPIED";
+ if(sensor==="AVAILABLE"&&active(bookings[id]))return "RESERVED";
+ if(sensor==="AVAILABLE")return "AVAILABLE";
+ return "UNKNOWN";
+}
 
- $("slotGrid").innerHTML=ids.map((id,index)=>{
+function renderSlots(){
+ let available=0,occupied=0,reserved=0,activeCount=0;
+
+ $("slotGrid").innerHTML=slotIds.map((id,i)=>{
   const sensor=physicalStatus(id);
-  const booked=isActiveBooking(bookings[id]);
+  const status=bookingStatus(id);
+  const b=bookings[id];
 
-  let display="WAITING FOR SENSOR";
-  if(sensor==="OCCUPIED")display="OCCUPIED";
-  else if(sensor==="AVAILABLE" && booked)display="RESERVED";
-  else if(sensor==="AVAILABLE")display="AVAILABLE";
+  if(status==="AVAILABLE")available++;
+  if(status==="OCCUPIED")occupied++;
+  if(status==="RESERVED")reserved++;
+  if(active(b))activeCount++;
 
-  if(sensor==="OCCUPIED")occupied++;
-  else if(sensor==="AVAILABLE" && booked)reserved++;
-  else if(sensor==="AVAILABLE")available++;
-
-  if(booked)activeBookings++;
-
-  const css=display==="OCCUPIED"?"occupied":
-   display==="RESERVED"?"reserved":
-   display==="AVAILABLE"?"available":"unknown";
-
-  const bookingInfo=booked
-   ? `<div class="source">Reserved by: ${escapeHTML(bookings[id].name||"Consumer")}</div>`
-   : "";
+  const css=status.toLowerCase();
 
   return `
-   <article class="slot">
-    <div class="slot-top">
-     <strong>Slot ${index+1}</strong>
-     <span class="pill ${css}">${display}</span>
-    </div>
-    <div class="slot-icon">🚘</div>
-    <div class="source">Physical Sensor: ${sensor}</div>
-    <div class="source">Booking: ${booked?"ACTIVE":"None"}</div>
-    ${bookingInfo}
-   </article>`;
+   <div class="slot">
+    <strong>Slot ${i+1}</strong>
+    <h3 class="${css}">${status}</h3>
+    <div class="small">Physical sensor: ${sensor}</div>
+    <div class="small">Booking: ${active(b)?"ACTIVE":"None"}</div>
+    ${active(b)?`<div class="small">Booked by: ${esc(b.name||"Consumer")}</div>`:""}
+   </div>`;
  }).join("");
 
  $("availableCount").textContent=available;
  $("occupiedCount").textContent=occupied;
  $("reservedCount").textContent=reserved;
- $("bookingCount").textContent=activeBookings;
-
- const activeIds=ids.filter(id=>isActiveBooking(bookings[id]));
-
- $("bookingList").innerHTML=activeIds.length
- ? activeIds.map(id=>{
-    const b=bookings[id];
-    return `
-     <div class="booking-row">
-      <strong>${escapeHTML(id.toUpperCase())}</strong>
-      <div class="muted small">${escapeHTML(b.name||"Consumer")}</div>
-      <div class="muted small">${escapeHTML(b.vehicle||"Vehicle not given")}</div>
-      <div class="muted small">${b.createdAt?new Date(b.createdAt).toLocaleString():"Time unavailable"}</div>
-     </div>`;
-   }).join("")
- : '<p class="muted">No active bookings.</p>';
+ $("bookingCount").textContent=activeCount;
 }
 
-function showMessage(text){
- $("message").textContent=text;
+function renderVenues(){
+ const entries=Object.entries(venues);
+
+ $("venueList").innerHTML=entries.length?entries.map(([id,v])=>`
+  <div class="row">
+   <strong>${esc(v.name)}</strong>
+   <div class="small">${esc(v.address||"Address not provided")}</div>
+   <div class="small">Slots: ${esc(v.slotCount||0)}</div>
+  </div>`).join(""):"No venues added yet.";
+
+ $("locationVenue").innerHTML=
+  '<option value="">Select venue</option>'+
+  entries.map(([id,v])=>
+   `<option value="${esc(id)}">${esc(v.name)}</option>`
+  ).join("");
 }
 
-function formatGate(value){
- if(value==null || value==="")return "Waiting for ESP32 data";
- if(typeof value==="object"){
-  return escapeHTML(value.status??value.state??JSON.stringify(value));
+function renderLocations(){
+ const entries=Object.entries(locations);
+
+ $("locationList").innerHTML=entries.length?entries.map(([id,l])=>`
+  <div class="row">
+   <strong>${esc(l.venueName||"Venue")}</strong>
+   <div>${esc([l.floor,l.zone,l.pillar,l.locationType].filter(Boolean).join(" · "))}</div>
+   <div class="small">Location ID: ${esc(id)}</div>
+   <button class="secondary" data-qr="${esc(id)}">Show QR</button>
+  </div>`).join(""):"No QR locations created yet.";
+
+ document.querySelectorAll("[data-qr]").forEach(btn=>{
+  btn.onclick=()=>showQr(btn.dataset.qr);
+ });
+}
+
+function renderBookings(){
+ const entries=Object.entries(bookings);
+
+ const activeEntries=entries.filter(([id,b])=>active(b));
+ const cancelled=entries.filter(([id,b])=>
+  String(b?.status||"").toUpperCase()==="CANCELLED"
+ );
+
+ $("bookingList").innerHTML=activeEntries.length?
+  activeEntries.map(([id,b])=>`
+   <div class="row">
+    <strong>${esc(id)}</strong>
+    <div>Name: ${esc(b.name||"Not provided")}</div>
+    <div>Vehicle: ${esc(b.vehicle||"Not provided")}</div>
+    <div class="small">UID: ${esc(b.uid||"Unknown")}</div>
+    <div class="small">Time: ${b.createdAt?new Date(b.createdAt).toLocaleString():"Not recorded"}</div>
+    <span class="badge reserved">ACTIVE</span>
+   </div>`).join("")
+  :'<p class="muted">No active bookings.</p>';
+
+ $("historyList").innerHTML=cancelled.length?
+  cancelled.map(([id,b])=>`
+   <div class="row">
+    <strong>${esc(id)}</strong>
+    <div>${esc(b.name||"Consumer")}</div>
+    <div class="small">Booked: ${b.createdAt?new Date(b.createdAt).toLocaleString():"Unknown"}</div>
+    <div class="small">Cancelled: ${b.cancelledAt?new Date(b.cancelledAt).toLocaleString():"Unknown"}</div>
+    <span class="badge">${esc(b.status)}</span>
+   </div>`).join("")
+  :'<p class="muted">No cancelled bookings yet.</p>';
+
+ $("reportActive").textContent=activeEntries.length;
+ $("reportCancelled").textContent=cancelled.length;
+ $("reportTotal").textContent=entries.length;
+}
+
+function showQr(id){
+ const l=locations[id];
+ if(!l)return;
+
+ const url=new URL("./consumer.html",location.href);
+ url.searchParams.set("locationId",id);
+ lastQrUrl=url.href;
+
+ $("qrDescription").textContent=
+  `${l.venueName||"Venue"} · ${[l.floor,l.zone,l.pillar].filter(Boolean).join(" · ")}`;
+
+ $("qrLink").href=lastQrUrl;
+ $("qrLink").textContent=lastQrUrl;
+ $("qrImage").src=
+  "https://api.qrserver.com/v1/create-qr-code/?size=300x300&data="+
+  encodeURIComponent(lastQrUrl);
+
+ $("qrResult").classList.remove("hidden");
+}
+
+async function addVenue(e){
+ e.preventDefault();
+
+ const name=$("venueName").value.trim();
+ const address=$("venueAddress").value.trim();
+ const slotCount=Number($("venueSlots").value);
+
+ if(!name||!Number.isInteger(slotCount)||slotCount<1||slotCount>500){
+  say("Enter a valid venue name and slot count.");
+  return;
  }
- return escapeHTML(value);
-}
 
-async function start(){
  try{
-  await signInAnonymously(auth);
-
-  $("connection").textContent="● Firebase Connected";
-  $("connection").className="connection ok";
-
-  onValue(ref(db,".info/connected"),snap=>{
-   const online=snap.val()===true;
-   $("connection").textContent=online
-    ?"● Firebase Connected":"○ Reconnecting…";
-   $("connection").className="connection "+(online?"ok":"");
+  const node=push(ref(db,"parksmart/venues"));
+  await set(node,{
+   name,address,slotCount,
+   createdAt:Date.now(),
+   createdBy:auth.currentUser.uid
   });
 
-  onValue(ref(db,"parksmart/slots"),snap=>{
-   slots=snap.val()||{};
-   render();
-  },error=>showMessage("Slot read error: "+error.message));
-
-  onValue(ref(db,"parksmart/bookings"),snap=>{
-   bookings=snap.val()||{};
-   render();
-  },error=>showMessage("Booking read error: "+error.message));
-
-  onValue(ref(db,"parksmart/gate/entry"),snap=>{
-   $("entryStatus").textContent=formatGate(snap.val());
-  },error=>{
-   $("entryStatus").textContent="Read error: "+error.message;
-  });
-
-  onValue(ref(db,"parksmart/gate/exit"),snap=>{
-   $("exitStatus").textContent=formatGate(snap.val());
-  },error=>{
-   $("exitStatus").textContent="Read error: "+error.message;
-  });
-
- }catch(error){
-  $("connection").textContent="Firebase Setup Needed";
-  $("connection").className="connection bad";
-  showMessage("Connection failed: "+error.message);
+  $("venueForm").reset();
+  $("venueSlots").value=4;
+  say("Venue added successfully.");
+ }catch(err){
+  say("Venue save failed: "+err.message);
  }
 }
 
-$("refreshButton").addEventListener("click",async()=>{
+async function addLocation(e){
+ e.preventDefault();
+
+ const venueId=$("locationVenue").value;
+ const venue=venues[venueId];
+
+ if(!venue){
+  say("Please select a valid venue.");
+  return;
+ }
+
+ const data={
+  venueId,
+  venueName:venue.name,
+  floor:$("floor").value.trim(),
+  zone:$("zone").value.trim(),
+  pillar:$("pillar").value.trim(),
+  locationType:$("locationType").value,
+  createdAt:Date.now(),
+  createdBy:auth.currentUser.uid
+ };
+
  try{
-  const [slotSnap,bookingSnap]=await Promise.all([
-   get(ref(db,"parksmart/slots")),
-   get(ref(db,"parksmart/bookings"))
-  ]);
-  slots=slotSnap.val()||{};
-  bookings=bookingSnap.val()||{};
-  render();
-  showMessage("Dashboard refreshed.");
- }catch(error){
-  showMessage("Refresh failed: "+error.message);
+  const node=push(ref(db,"parksmart/locations"));
+  await set(node,data);
+  $("locationForm").reset();
+  say("QR parking location saved.");
+  showQr(node.key);
+ }catch(err){
+  say("Location save failed: "+err.message);
+ }
+}
+
+async function startDashboard(user){
+ const email=(user.email||"").toLowerCase();
+ const allowed=ADMIN_EMAIL.toLowerCase();
+
+ if(allowed==="put_your_admin_gmail_here"||email!==allowed){
+  $("loginMessage").textContent=
+   "This Google account is not authorized as ParkSmart Admin.";
+  await signOut(auth);
+  return;
+ }
+
+ $("loginPanel").style.display="none";
+ $("app").style.display="block";
+ $("connection").textContent="● Signed in";
+
+ onValue(ref(db,".info/connected"),s=>{
+  $("connection").textContent=s.val()?"● Firebase Connected":"Reconnecting…";
+ });
+
+ onValue(ref(db,"parksmart/slots"),s=>{
+  slots=s.val()||{};
+  renderSlots();
+ },e=>say("Sensor read error: "+e.message));
+
+ onValue(ref(db,"parksmart/bookings"),s=>{
+  bookings=s.val()||{};
+  renderBookings();
+  renderSlots();
+ },e=>say("Booking read error: "+e.message));
+
+ onValue(ref(db,"parksmart/gate/entry"),s=>{
+  $("entryStatus").textContent=JSON.stringify(s.val()??"Waiting for data");
+ });
+
+ onValue(ref(db,"parksmart/gate/exit"),s=>{
+  $("exitStatus").textContent=JSON.stringify(s.val()??"Waiting for data");
+ });
+
+ onValue(ref(db,"parksmart/venues"),s=>{
+  venues=s.val()||{};
+  renderVenues();
+ });
+
+ onValue(ref(db,"parksmart/locations"),s=>{
+  locations=s.val()||{};
+  renderLocations();
+ });
+}
+
+$("loginBtn").onclick=async()=>{
+ try{
+  $("loginMessage").textContent="Opening Google sign-in…";
+  await signInWithPopup(auth,provider);
+ }catch(e){
+  $("loginMessage").textContent="Login failed: "+e.message;
+ }
+};
+
+$("logoutBtn").onclick=()=>signOut(auth);
+
+$("venueForm").addEventListener("submit",addVenue);
+$("locationForm").addEventListener("submit",addLocation);
+
+$("downloadQr").onclick=async()=>{
+ if(!lastQrUrl)return;
+ try{
+  const response=await fetch($("qrImage").src);
+  const blob=await response.blob();
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement("a");
+  a.href=url;
+  a.download="ParkSmart-Location-QR.png";
+  a.click();
+  URL.revokeObjectURL(url);
+ }catch(e){
+  say("QR download failed. Open the QR image and save it.");
+ }
+};
+
+onAuthStateChanged(auth,user=>{
+ if(user){
+  startDashboard(user);
+ }else{
+  $("app").style.display="none";
+  $("loginPanel").style.display="block";
  }
 });
-
-render();
-start();
 </script>
 </body>
 </html>
