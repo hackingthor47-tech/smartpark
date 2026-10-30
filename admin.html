@@ -194,25 +194,26 @@ import {
 } from "https://www.gstatic.com/firebasejs/13.0.0/firebase-auth.js";
 
 import {
- getDatabase,ref,onValue,push,set,get
+ getDatabase,ref,onValue,push,set
 } from "https://www.gstatic.com/firebasejs/13.0.0/firebase-database.js";
 
-/* IMPORTANT: Replace this with your own Google account email. */
+/* Admin Google account */
 const ADMIN_EMAIL = "hackingthor47@gmail.com";
 
+/* Firebase configuration */
 const firebaseConfig = {
- apiKey:"AIzaSyAsffyVnKES_-tZz3pnuojPLPFBk3TJe5",
- authDomain:"smartpark-9ecbb.firebaseapp.com",
- databaseURL:"https://smartpark-9ecbb-default-rtdb.asia-southeast1.firebasedatabase.app",
- projectId:"smartpark-9ecbb",
- storageBucket:"smartpark-9ecbb.firebasestorage.app",
- messagingSenderId:"423958538578",
- appId:"1:423958538578:web:b7c5395f8348e3a00f728b"
+  apiKey: "AIzaSyAsffyVnKES_-tZz3pnuojPLPFBk3TJe5E",
+  authDomain: "smartpark-9ecbb.firebaseapp.com",
+  databaseURL: "https://smartpark-9ecbb-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "smartpark-9ecbb",
+  storageBucket: "smartpark-9ecbb.firebasestorage.app",
+  messagingSenderId: "423958538578",
+  appId: "1:423958538578:web:b7c5395f8348e3a00f728b"
 };
 
-const app=initializeApp(firebaseConfig);
-const auth=getAuth(app);
-const db=getDatabase(app);
+const firebaseApp=initializeApp(firebaseConfig);
+const auth=getAuth(firebaseApp);
+const db=getDatabase(firebaseApp);
 const provider=new GoogleAuthProvider();
 provider.setCustomParameters({prompt:"select_account"});
 
@@ -445,7 +446,7 @@ async function startDashboard(user){
  const email=(user.email||"").toLowerCase();
  const allowed=ADMIN_EMAIL.toLowerCase();
 
- if(allowed==="put_your_admin_gmail_here"||email!==allowed){
+ if(email!==allowed){
   $("loginMessage").textContent=
    "This Google account is not authorized as ParkSmart Admin.";
   await signOut(auth);
