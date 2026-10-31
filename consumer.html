@@ -2,308 +2,157 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>ParkSmart | Consumer Dashboard</title>
-<script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-database-compat.js"></script>
 <style>
-:root{--bg:#061225;--nav:#041126;--line:#203d5b;--cyan:#4bd4ff;--muted:#a9bdd5;--white:#f5f9ff}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--white);font-family:Inter,"Segoe UI",Arial,sans-serif}
-a{color:inherit;text-decoration:none}button,input{font:inherit}
-.layout{display:grid;grid-template-columns:240px 1fr;min-height:100vh}
-aside{background:var(--nav);border-right:1px solid #1b2c43;padding:25px 17px}
-.brand{font-size:22px;font-weight:850;color:#60d7ff;margin:0 0 35px}
-nav a{display:block;padding:13px 14px;border-radius:11px;color:var(--muted);margin:5px 0}
-nav a.active,nav a:hover{background:#102c49;color:var(--cyan)}
-main{padding:34px;min-width:0}.top{display:flex;justify-content:space-between;align-items:center;gap:15px;flex-wrap:wrap}
-.kicker{color:var(--cyan);font-size:11px;font-weight:900;letter-spacing:1.8px}
-h1{font-size:32px;margin:9px 0}.muted{color:var(--muted);font-size:14px}
-.pill{padding:9px 13px;border-radius:30px;background:#123b35;color:#67f2c5;font-size:12px;font-weight:800}
-.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;margin-top:25px}
-.card,.panel{background:linear-gradient(145deg,#102c49,#081a30);border:1px solid var(--line);border-radius:20px;padding:23px;min-width:0}
-.cardhead{display:flex;justify-content:space-between;align-items:center}
-.caricon{width:58px;height:58px;border-radius:16px;background:#12466a;display:grid;place-items:center;color:#a6eaff}
-.caricon svg{width:35px;height:35px}
-.status{font-size:11px;font-weight:850;padding:8px 12px;border-radius:30px;background:#123b35;color:#67f2c5}
-.status.occupied{background:#48252e;color:#ff9ba9}.status.reserved{background:#45371d;color:#ffd77c}
-.card h2{font-size:21px;margin:22px 0 7px}.slotid{color:#7f9bb9;font-size:12px;letter-spacing:1px}
-.row{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
-.btn{border:0;border-radius:11px;padding:12px 15px;background:linear-gradient(110deg,#12b9f5,#0872ed);color:#fff;font-weight:800;cursor:pointer}
-.btn.secondary{background:#102c49;border:1px solid #315273}.btn:disabled{opacity:.45;cursor:not-allowed}
-.panel{margin-top:22px}.panel h2{margin:10px 0}.notice{color:var(--muted);font-size:13px;line-height:1.5}
-.field{width:100%;padding:12px;border:1px solid #315273;background:#07172b;color:#fff;border-radius:10px;margin:7px 0 12px}
-.formgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-@media(max-width:760px){.layout{grid-template-columns:1fr}aside{padding:15px;border-right:0;border-bottom:1px solid #1b2c43}.brand{margin:0 0 12px}nav{display:flex;gap:5px;flex-wrap:wrap}nav a{padding:9px 11px;margin:0}main{padding:20px}.grid{grid-template-columns:1fr}h1{font-size:27px}}
-@media(max-width:560px){.formgrid{grid-template-columns:1fr}}
+:root{--line:#285071;--text:#f1f7ff;--muted:#a8bdd4;--cyan:#38c9ff;--green:#00d6a0;--red:#ff5879;--amber:#ffc247}
+*{box-sizing:border-box}
+body{margin:0;color:var(--text);font:15px/1.6 "Segoe UI",Arial,sans-serif;background:linear-gradient(115deg,#030c1ff5,#031225df),url("https://images.unsplash.com/photo-1590674899484-d5640e854abe?auto=format&fit=crop&w=2000&q=85") center/cover fixed}
+header{padding:20px 4%;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;background:#030f20ed;border-bottom:1px solid var(--line)}
+h1{margin:0;font-size:28px}h1 span{color:var(--cyan)}header p{margin:3px 0 0;color:var(--muted)}
+nav{display:flex;gap:18px;flex-wrap:wrap}a{color:#8ce2ff;text-decoration:none;font-weight:650}
+main{max-width:1400px;margin:auto;padding:28px 20px}
+.hero{padding:clamp(24px,4vw,44px);border:1px solid var(--line);border-radius:22px;background:linear-gradient(100deg,#06172bed,#06172b9c),url("https://images.unsplash.com/photo-1506521781263-d8422e82f27a?auto=format&fit=crop&w=1600&q=85") center/cover;margin-bottom:20px}
+.eyebrow{font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--cyan);font-weight:800}
+.hero h2{font-size:clamp(30px,4vw,44px);line-height:1.15;margin:9px 0}.hero p{color:#c0d5e9;max-width:700px}
+.panel,.stat,.slot{background:linear-gradient(145deg,rgba(12,35,61,.97),rgba(5,20,39,.97));border:1px solid var(--line);border-radius:18px;box-shadow:0 12px 35px #0003}
+.panel{padding:22px;margin:18px 0;min-width:0}.panel h2{font-size:22px}.panel h2:after{content:"";display:block;width:45px;height:3px;margin-top:7px;background:linear-gradient(90deg,var(--cyan),transparent)}
+.pill,.badge{display:inline-block;border:1px solid var(--line);border-radius:25px;padding:6px 12px;background:#071a2d;color:var(--cyan);font-size:12px}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin:20px 0}.stat{padding:20px}.stat small{display:block;color:var(--muted)}.stat strong{font-size:32px;color:var(--cyan)}
+.slots{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}.slot{padding:16px;min-width:0;overflow-wrap:anywhere;transition:.2s}.slot:hover{transform:translateY(-3px);border-color:#38c9ff99}.slot h3{margin:10px 0}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.notice{padding:15px;border:1px solid var(--line);border-radius:12px;background:#061a30;overflow-wrap:anywhere}
+.item{padding:14px 0;border-bottom:1px solid #285071;overflow-wrap:anywhere}.item:last-child{border-bottom:0}
+button{padding:10px 14px;margin:7px 5px 0 0;border:1px solid #ffffff20;border-radius:10px;background:linear-gradient(135deg,#078cff,#075bce);color:white;font:inherit;font-weight:700;cursor:pointer}
+button.secondary{background:#203b58}button.danger{background:#a92b49}button:disabled{opacity:.45;cursor:not-allowed}
+.muted{color:var(--muted);font-size:13px}.good{color:var(--green)}.bad{color:var(--red)}.warn{color:var(--amber)}.small{font-size:12px;color:var(--muted)}
+@media(max-width:1000px){.slots{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:650px){main{padding:14px 10px}.panel{padding:15px}.grid,.stats{grid-template-columns:1fr}.slots{grid-template-columns:repeat(2,minmax(0,1fr))}}
 </style>
 </head>
 <body>
-<div class="layout">
-<aside>
-  <div class="brand">▣ ParkSmart</div>
-  <nav>
-    <a href="index.html">Home</a>
-    <a class="active" href="consumer.html">Consumer</a>
-    <a href="hardware.html">Hardware</a>
-    <a href="admin.html">Admin</a>
-  </nav>
-</aside>
-
+<header>
+ <div><h1>🚗 Park<span>Smart</span></h1><p>Your smarter parking companion</p></div>
+ <nav><a href="./index.html">Home</a><a href="./admin.html">Admin</a><a href="./hardware.html">Hardware</a></nav>
+</header>
 <main>
-  <header class="top">
-    <div>
-      <div class="kicker">YOUR PARKING WORKSPACE</div>
-      <h1>Consumer Dashboard</h1>
-      <div class="muted" id="venueLine">Find a slot, book it, and save your parking location.</div>
-    </div>
-    <span class="pill" id="authState">Connecting…</span>
-  </header>
-
-  <section class="grid" id="slots"></section>
-
-  <section class="panel">
-    <div class="kicker">PARKING MEMORY</div>
-    <h2>Save My Parking</h2>
-    <p class="notice">Save the selected QR location or your active booking to Firebase.</p>
-
-    <div class="formgrid">
-      <div>
-        <label class="notice" for="saveLabel">Parking label</label>
-        <input class="field" id="saveLabel" placeholder="e.g. Level 2, Slot 4">
-      </div>
-      <div>
-        <label class="notice" for="saveAddress">Venue / address</label>
-        <input class="field" id="saveAddress" placeholder="Venue name or address">
-      </div>
-    </div>
-
-    <div class="row">
-      <button class="btn" id="saveBtn">Save My Parking</button>
-      <button class="btn secondary" id="findBtn">Find My Vehicle</button>
-    </div>
-    <div id="savedResult" class="notice" style="margin-top:14px"></div>
-  </section>
+ <section class="hero">
+  <div class="eyebrow">Park smarter · Move easier</div>
+  <h2>Find your spot.<br>Remember your car.</h2>
+  <p>Check parking availability, reserve an available slot, and save your parking location by scanning a ParkSmart QR code.</p>
+  <span class="pill" id="connection">Connecting to Firebase…</span>
+ </section>
+ <section class="panel"><h2>📍 Your QR Parking Location</h2><div id="qrLocation" class="notice">Checking this link for a parking location…</div><button id="saveQrLocation" disabled>＋ Save My Parking</button></section>
+ <section class="stats">
+  <div class="stat"><small>Available slots</small><strong id="availableCount">—</strong></div>
+  <div class="stat"><small>Occupied slots</small><strong id="occupiedCount">—</strong></div>
+  <div class="stat"><small>Active bookings</small><strong id="bookingCount">—</strong></div>
+ </section>
+ <section class="panel"><h2>🅿️ Live Parking Slots</h2><p class="muted">Slot availability and bookings update from Firebase.</p><div id="slots">Waiting for parking data…</div></section>
+ <div class="grid">
+  <section class="panel"><h2>🔎 Find My Car</h2><p class="muted">View your saved venue, floor, zone and pillar details.</p><div id="savedLocations">No saved locations yet.</div></section>
+  <section class="panel"><h2>🕘 Recent Activity</h2><div id="history">No history yet.</div><button id="clearHistory" class="secondary">Clear History</button></section>
+ </div>
+ <section class="panel"><h2>About your saved data</h2><p class="muted">Saved locations and activity history stay in this browser. Firebase bookings are shared through the database. Local saved locations do not automatically transfer to another device.</p></section>
 </main>
-</div>
+<script type="module">
+import {initializeApp} from "https://www.gstatic.com/firebasejs/13.0.0/firebase-app.js";
+import {getAuth,signInAnonymously} from "https://www.gstatic.com/firebasejs/13.0.0/firebase-auth.js";
+import {getDatabase,ref,onValue,runTransaction,get} from "https://www.gstatic.com/firebasejs/13.0.0/firebase-database.js";
 
-<script>
-const firebaseConfig = {
-  apiKey: "AIzaSyAsffyVnKES_-tZz3pnuojPLPFBk3TJe5E",
-  authDomain: "smartpark-9ecbb.firebaseapp.com",
-  databaseURL: "https://smartpark-9ecbb-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "smartpark-9ecbb",
-  storageBucket: "smartpark-9ecbb.firebasestorage.app",
-  messagingSenderId: "423958538578",
-  appId: "1:423958538578:web:b7c5395f8348e3a00f728b"
+const cfg={
+ apiKey:"AIzaSyAsffyVnKES_-tZz3pnuojPLPFBk3TJe5E",
+ authDomain:"smartpark-9ecbb.firebaseapp.com",
+ databaseURL:"https://smartpark-9ecbb-default-rtdb.asia-southeast1.firebasedatabase.app",
+ projectId:"smartpark-9ecbb",
+ storageBucket:"smartpark-9ecbb.firebasestorage.app",
+ messagingSenderId:"423958538578",
+ appId:"1:423958538578:web:b7c5395f8348e3a00f728b"
 };
-
-firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
-const db = firebase.database();
-
-let user = null;
-let slotData = {};
-let bookings = {};
-let qrLocation = null;
-
-const slotIds = ["slot1","slot2","slot3","slot4"];
-
-const carSvg = `
-<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
-     stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-  <path d="m3 13 2-6h14l2 6v6H3z"/>
-  <path d="M5 13h14M7 17h.01M17 17h.01M7 7l1-3h8l1 3"/>
-</svg>`;
-
-function activeBooking(slotId) {
-  return Object.entries(bookings).find(
-    ([key,b]) => b && b.slot === slotId && b.status === "ACTIVE"
-  );
+const app=initializeApp(cfg),auth=getAuth(app),db=getDatabase(app);
+const $=id=>document.getElementById(id),slotIds=["slot1","slot2","slot3","slot4"];
+let uid=null,sensors={},bookings={},currentLocation=null,sensorLoaded=false,bookingLoaded=false;
+const esc=x=>String(x??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+function status(v){if(v&&typeof v==="object")v=v.status??v.state??v.occupancy??v.value;const s=String(v??"").trim().toUpperCase();if(["AVAILABLE","FREE","EMPTY","0"].includes(s))return"AVAILABLE";if(["OCCUPIED","FULL","1"].includes(s))return"OCCUPIED";return"UNKNOWN"}
+function active(b){return !!b&&["ACTIVE","BOOKED"].includes(String(b.status||"").toUpperCase())}
+function readHistory(){try{const x=JSON.parse(localStorage.getItem("ps_history")||"[]");return Array.isArray(x)?x:[]}catch{return[]}}
+function addHistory(title,detail){const x=readHistory();x.unshift({title,detail,time:new Date().toLocaleString()});localStorage.setItem("ps_history",JSON.stringify(x.slice(0,40)));renderHistory()}
+function renderHistory(){$("history").innerHTML=readHistory().map(x=>`<div class="item"><strong>${esc(x.title)}</strong><div>${esc(x.detail)}</div><small class="muted">${esc(x.time)}</small></div>`).join("")||'<p class="muted">No history yet.</p>'}
+function readSaved(){try{const x=JSON.parse(localStorage.getItem("ps_locations")||"[]");return Array.isArray(x)?x:[]}catch{return[]}}
+function writeSaved(x){localStorage.setItem("ps_locations",JSON.stringify(x.slice(0,50)));renderSaved()}
+function describe(l){return[l.venueName||"Parking venue",l.floor,l.zone,l.pillar,l.locationType].filter(Boolean).join(" · ")}
+function renderSaved(){
+ $("savedLocations").innerHTML=readSaved().map((l,i)=>`<div class="item"><strong>${esc(l.venueName||"Saved parking")}</strong><div>${esc(describe(l))}</div><small class="muted">${esc(l.savedAt||"")}</small><div><button data-view="${i}">View Details</button><button class="danger" data-remove="${i}">Remove</button></div></div>`).join("")||'<p class="muted">No saved locations yet. Scan a ParkSmart QR code first.</p>';
+ document.querySelectorAll("[data-view]").forEach(b=>b.onclick=()=>{const l=readSaved()[+b.dataset.view];if(l)alert("Saved parking location:\n\n"+describe(l))});
+ document.querySelectorAll("[data-remove]").forEach(b=>b.onclick=()=>{const x=readSaved(),i=+b.dataset.remove;if(!x[i]||!confirm("Remove this saved location?"))return;const l=x.splice(i,1)[0];writeSaved(x);addHistory("Removed parking location",describe(l))});
 }
-
-function renderSlots() {
-  document.getElementById("slots").innerHTML = slotIds.map((id,index) => {
-    const sensor = String(slotData[id] || "UNKNOWN").toUpperCase();
-    const active = activeBooking(id);
-    const reserved = Object.values(bookings).some(
-      b => b && b.slot === id && b.status === "ACTIVE"
-    );
-
-    const state = sensor === "OCCUPIED" ? "OCCUPIED"
-      : reserved ? "RESERVED"
-      : sensor === "AVAILABLE" ? "AVAILABLE"
-      : "UNKNOWN";
-
-    const cls = state === "OCCUPIED" ? "occupied"
-      : state === "RESERVED" ? "reserved" : "";
-
-    const isMine = active && active[1].uid === user.uid;
-    const action = isMine
-      ? `<button class="btn secondary" onclick="cancelBooking('${active[0]}')">Cancel Booking</button>`
-      : state === "AVAILABLE"
-        ? `<button class="btn" onclick="bookSlot('${id}')">Book My Slot</button>`
-        : `<button class="btn" disabled>Not Available</button>`;
-
-    return `
-      <article class="card">
-        <div class="cardhead">
-          <span class="caricon">${carSvg}</span>
-          <span class="status ${cls}">${state}</span>
-        </div>
-        <h2>Parking Slot ${index + 1}</h2>
-        <div class="slotid">${id.toUpperCase()} · Sensor: ${sensor}</div>
-        <div class="row">
-          ${action}
-          <button class="btn secondary" onclick="selectSlot('${id}')">Save My Parking</button>
-        </div>
-      </article>`;
-  }).join("");
+function renderSlots(){
+ const available=slotIds.filter(id=>status(sensors[id])==="AVAILABLE"&&!active(bookings[id])).length;
+ const occupied=slotIds.filter(id=>status(sensors[id])==="OCCUPIED").length;
+ const booked=slotIds.filter(id=>active(bookings[id])).length;
+ $("availableCount").textContent=available;$("occupiedCount").textContent=occupied;$("bookingCount").textContent=booked;$("slots").className="slots";
+ $("slots").innerHTML=slotIds.map(id=>{
+  const s=status(sensors[id]),b=active(bookings[id])?bookings[id]:null,mine=!!(b&&uid&&b.uid===uid);
+  const can=!!uid&&sensorLoaded&&bookingLoaded&&s==="AVAILABLE"&&!b;
+  const action=mine?`<button class="secondary" data-cancel="${id}">Cancel My Booking</button>`:can?`<button data-book="${id}">Book Slot</button>`:`<button disabled>${s==="UNKNOWN"?"Sensor Unknown":b?"Reserved":s==="OCCUPIED"?"Occupied":"Unavailable"}</button>`;
+  const label=s==="AVAILABLE"?"Available":s==="OCCUPIED"?"Occupied":"Unknown",cls=s==="AVAILABLE"?"good":s==="OCCUPIED"?"bad":"warn";
+  return `<article class="slot"><span class="badge">${esc(id)}</span><h3>${esc(id.replace("slot","Slot "))}</h3><p class="${cls}">Slot status: ${label}</p><p>Booking: ${b?(mine?"Your booking":"Reserved"):"Not booked"}</p>${action}</article>`;
+ }).join("");
+ document.querySelectorAll("[data-book]").forEach(b=>b.onclick=()=>book(b.dataset.book));
+ document.querySelectorAll("[data-cancel]").forEach(b=>b.onclick=()=>cancel(b.dataset.cancel));
 }
-
-async function bookSlot(slotId) {
-  const ref = db.ref("parksmart/bookings/" + slotId);
-  try {
-    const result = await ref.transaction(current => {
-      if (current && current.status === "ACTIVE") return;
-      return {
-        uid: user.uid,
-        name: user.displayName || user.email || "ParkSmart user",
-        email: user.email || "",
-        vehicle: "",
-        slot: slotId,
-        status: "ACTIVE",
-        createdAt: Date.now(),
-        venueId: qrLocation?.venueId || "",
-        venueName: qrLocation?.venueName || "ParkSmart"
-      };
-    });
-    if (!result.committed) alert("This slot is already booked.");
-  } catch (error) {
-    alert(error.message);
-  }
-}
-
-async function cancelBooking(slotId) {
-  const ref = db.ref("parksmart/bookings/" + slotId);
-  const snapshot = await ref.get();
-  const booking = snapshot.val();
-
-  if (!booking || booking.uid !== user.uid) {
-    alert("You can cancel only your own booking.");
-    return;
-  }
-
-  await ref.update({
-    status: "CANCELLED",
-    cancelledAt: Date.now()
+async function book(id){
+ if(!uid){alert("Firebase is not ready.");return}
+ if(status(sensors[id])!=="AVAILABLE"){alert("This slot is not currently available.");return}
+ const name=prompt("Your name (optional):")||"",vehicle=prompt("Vehicle number (optional):")||"";
+ try{
+  const r=await runTransaction(ref(db,"parksmart/bookings/"+id),old=>{
+   if(old&&active(old))return;if(status(sensors[id])!=="AVAILABLE")return;
+   return{uid,slot:id,status:"ACTIVE",name:name.trim(),vehicle:vehicle.trim(),createdAt:Date.now(),source:"consumer"};
   });
+  if(r.committed&&r.snapshot.val()?.uid===uid){addHistory("Booked "+id,"Booking saved to Firebase.");alert("Booking successful.");}
+  else alert("Booking not saved. The slot may already be reserved.");
+ }catch(e){alert("Booking failed: "+e.message)}
 }
-
-function selectSlot(slotId) {
-  document.getElementById("saveLabel").value =
-    (qrLocation?.label ? qrLocation.label + " · " : "") + slotId.toUpperCase();
-
-  document.getElementById("saveAddress").value =
-    qrLocation?.venueName || "";
-
-  document.getElementById("savedResult").textContent =
-    "Slot selected. Tap Save My Parking to store it.";
+async function cancel(id){
+ if(!confirm("Cancel your booking for "+id+"?"))return;
+ try{
+  const r=await runTransaction(ref(db,"parksmart/bookings/"+id),old=>{
+   if(!old||old.uid!==uid||!active(old))return;
+   return{...old,status:"CANCELLED",cancelledAt:Date.now()};
+  });
+  if(r.committed&&String(r.snapshot.val()?.status||"").toUpperCase()==="CANCELLED"){addHistory("Cancelled "+id,"Booking cancellation saved to Firebase.");alert("Booking cancelled.");}
+  else alert("Booking was not cancelled. Please refresh and check its status.");
+ }catch(e){alert("Cancellation failed: "+e.message)}
 }
-
-document.getElementById("saveBtn").onclick = async () => {
-  const active = Object.values(bookings).find(
-    b => b && b.uid === user.uid && b.status === "ACTIVE"
-  );
-
-  const label = document.getElementById("saveLabel").value.trim()
-    || qrLocation?.label
-    || active?.slot
-    || "";
-
-  if (!label) {
-    alert("Select a slot or enter a parking label.");
-    return;
-  }
-
-  const record = {
-    label,
-    address: document.getElementById("saveAddress").value.trim()
-      || qrLocation?.venueName || "",
-    venueId: qrLocation?.venueId || active?.venueId || "",
-    venueName: qrLocation?.venueName || active?.venueName || "",
-    slot: active?.slot || "",
-    savedAt: Date.now()
-  };
-
-  await db.ref("parksmart/vehicleLocations/" + user.uid).set(record);
-  document.getElementById("savedResult").textContent =
-    "Parking location saved to Firebase: " + label;
+function showLocation(l,source){
+ currentLocation=l;$("qrLocation").innerHTML=`<strong>${esc(l.venueName||"Parking location")}</strong><p>${esc(describe(l))}</p>${l.locationId?`<p class="muted">Location ID: ${esc(l.locationId)}</p>`:""}<p class="muted">${source==="qr"?"Loaded from QR link.":"Loaded from saved parking."}</p>`;$("saveQrLocation").disabled=false;
+}
+async function loadLocation(){
+ const id=new URLSearchParams(location.search).get("locationId");
+ if(!id){$("qrLocation").innerHTML='<p class="muted">No QR location in this link. Scan a QR code created in ParkSmart Admin.</p>';return}
+ try{
+  const s=await get(ref(db,"parksmart/locations/"+id));
+  if(!s.exists()){$("qrLocation").innerHTML='<p class="warn">Location not found. Confirm it was saved in Admin and Firebase rules permit reading it.</p>';return}
+  const d=s.val();let venueName=d.venueName||"Parking venue";
+  if(d.venueId){try{const v=await get(ref(db,"parksmart/venues/"+d.venueId));if(v.exists())venueName=v.val().name||venueName}catch{}}
+  showLocation({locationId:id,venueId:d.venueId||"",venueName,floor:d.floor||"",zone:d.zone||"",pillar:d.pillar||"",locationType:d.locationType||""},"qr");
+ }catch(e){$("qrLocation").innerHTML='<p class="bad">Location load failed: '+esc(e.message)+'</p>'}
+}
+$("saveQrLocation").onclick=()=>{
+ if(!currentLocation)return;const x=readSaved();
+ if(currentLocation.locationId&&x.some(l=>l.locationId===currentLocation.locationId)){alert("This location is already saved.");return}
+ const item={...currentLocation,savedAt:new Date().toLocaleString()};x.unshift(item);writeSaved(x);addHistory("Saved parking location",describe(item));alert("Parking location saved in this browser.");
 };
-
-document.getElementById("findBtn").onclick = async () => {
-  const snapshot = await db.ref(
-    "parksmart/vehicleLocations/" + user.uid
-  ).get();
-
-  const saved = snapshot.val();
-
-  if (!saved) {
-    document.getElementById("savedResult").textContent =
-      "No saved parking location found.";
-    return;
-  }
-
-  let result = `Saved location: ${saved.label} · ${saved.venueName || saved.address || ""}`;
-
-  if (saved.address) {
-    result += ` · <a style="color:#55d8ff" target="_blank" rel="noopener"
-      href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(saved.address)}">Directions ↗</a>`;
-  }
-
-  document.getElementById("savedResult").innerHTML = result;
-};
-
-async function loadQrLocation() {
-  const locationId = new URLSearchParams(location.search).get("locationId");
-  if (!locationId) return;
-
-  const snapshot = await db.ref("parksmart/locations/" + locationId).get();
-  qrLocation = snapshot.val();
-
-  if (!qrLocation) {
-    document.getElementById("venueLine").textContent =
-      "QR location not found in Firebase.";
-    return;
-  }
-
-  document.getElementById("venueLine").textContent =
-    `${qrLocation.venueName || "Parking venue"} · ${qrLocation.label || "Selected location"}`;
-
-  document.getElementById("saveLabel").value = qrLocation.label || "";
-  document.getElementById("saveAddress").value = qrLocation.venueName || "";
-}
-
-auth.signInAnonymously().then(async credential => {
-  user = credential.user;
-  document.getElementById("authState").textContent = "● Signed in";
-
-  await loadQrLocation();
-
-  db.ref("parksmart/slots").on("value", snapshot => {
-    slotData = snapshot.val() || {};
-    renderSlots();
-  });
-
-  db.ref("parksmart/bookings").on("value", snapshot => {
-    bookings = snapshot.val() || {};
-    renderSlots();
-  });
-}).catch(error => {
-  document.getElementById("authState").textContent = "Auth error";
-  document.getElementById("slots").innerHTML =
-    `<article class="card">${error.message}</article>`;
-});
+$("clearHistory").onclick=()=>{if(confirm("Clear activity history from this browser?")){localStorage.removeItem("ps_history");renderHistory()}};
+renderHistory();renderSaved();renderSlots();
+try{
+ const c=await signInAnonymously(auth);uid=c.user.uid;
+ $("connection").textContent="● Firebase connected";$("connection").style.color="var(--green)";
+ onValue(ref(db,"parksmart/slots"),s=>{sensors=s.val()||{};sensorLoaded=true;renderSlots()},e=>{$("connection").textContent="Sensor read error: "+e.message;$("connection").style.color="var(--red)"});
+ onValue(ref(db,"parksmart/bookings"),s=>{bookings=s.val()||{};bookingLoaded=true;renderSlots()},e=>{$("connection").textContent="Booking read error: "+e.message;$("connection").style.color="var(--red)"});
+ await loadLocation();
+}catch(e){$("connection").textContent="Firebase error: "+e.message;$("connection").style.color="var(--red)";$("qrLocation").innerHTML='<p class="warn">Check internet, Anonymous Authentication and Firebase Rules.</p>'}
 </script>
 </body>
 </html>
