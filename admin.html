@@ -391,15 +391,17 @@ let listeners = [];
 /* GOOGLE LOGIN - KEEP WORKING VERSION */
 document.getElementById("googleLoginBtn").addEventListener("click", async function () {
   const errorBox = document.getElementById("loginError");
-  errorBox.textContent = "Opening Google sign-in...";
+  errorBox.textContent = "Google sign-in தொடங்குகிறது…";
+
   try {
     const provider = new firebase.auth.GoogleAuthProvider();
     provider.setCustomParameters({ prompt: "select_account" });
+
     await auth.signInWithPopup(provider);
     errorBox.textContent = "";
   } catch (error) {
     console.error("Google Login Error:", error);
-    errorBox.textContent = error.message;
+    errorBox.textContent = `${error.code || "Error"}: ${error.message || error}`;
   }
 });
 
