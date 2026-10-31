@@ -237,7 +237,6 @@ const firebaseConfig = {
   messagingSenderId: "423958538578",
   appId: "1:423958538578:web:b7c5395f8348e3a00f728b"
 };
-
 /* Use the exact same firebaseConfig values already used in your working hardware/consumer app. */
 const ADMIN_EMAIL = "hackingthor47@gmail.com";
 const CONSUMER_URL = "https://hackingthor47-tech.github.io/smartpark/consumer.html";
@@ -393,4 +392,184 @@ function renderQRs(){
     if(!target)return;
     target.innerHTML="";
     const url=loc.url||`${CONSUMER_URL}?locationId=${encodeURIComponent(id)}`;
-    new QRC
+    new QRCode(target,{text:url,width:100,height:100,correctLevel:QRCode.CorrectLevel.M});
+  });
+}
+function bookingVenue(b){
+  if(b.venueName)return b.venueName;
+  if(b.venueId&&venues[b.venueId])return venues[b.venueId].name||"Venue";
+  return consumerVenueName();
+}
+function bookingTableHTML(rows,showVenue=true){
+  return `<table><thead><tr><th>Slot</th><th>Name</th><th>Vehicle</th>${showVenue?"<th>Venue</th>":""}<th>Status</th><th>Created</th></tr></thead><tbody>${
+    rows.map(({b,slot,status})=>`<tr>
+      <td>${esc(slot)}</td><td>${esc(b.name||"—")}</td><td>${esc(b.vehicle||"—")}</td>
+      ${showVenue?`<td>${esc(bookingVenue(b))}</td>`:""}
+      <td><span class="badge ${status==="CANCELLED"?"cancelled":isActive(b)?"active":""}">${esc(status||"UNKNOWN")}</span></td>
+      <td>${esc(formatDate(b.createdAt))}</td>
+    </tr>`).join("")
+  }</tbody></table>`;
+}
+function renderBookings(){
+  const q=$("bookingSearch").value.trim().toLowerCase();
+  const filter=$("bookingFilter").value;
+  const rows=bookingRows().filter(({b,slot,status})=>{
+    const matchesFilter=filter==="ALL"||status===filter;
+    const text=[slot,b.name,b.vehicle,b.email,bookingVenue(b),status].join(" ").toLowerCase();
+    return matchesFilter&&text.includes(q);
+  }).sort((a,b)=>Number(b.b.createdAt||0)-Number(a.b.createdAt||0));
+  $("bookingTable").innerHTML=rows.length?bookingTableHTML(rows,true):'<div class="empty">No matching booking records.</div>';
+}
+function renderReports(){
+  const rows=bookingRows();
+  const active=rows.filter(x=>isActive(x.b)).length;
+  const cancelled=rows.filter(x=>isCancelled(x.b)).length;
+  $("reportSummary").innerHTML=`<div class="grid">
+    <div class="stat"><div class="stat-label">Current records</div><div class="stat-value">${rows.length}</div></div>
+    <div class="stat"><div class="stat-label">Active</div><div class="stat-value">${active}</div></div>
+    <div class="stat"><div class="stat-label">Cancelled</div><div class="stat-value">${cancelled}</div></div>
+    <div class="stat"><div class="stat-label">Venues</div><div class="stat-value">${Object.keys(venues).length}</div></div>
+  </div>`;
+}
+function goPage(page){
+  document.querySelectorAll(".page").forEach(el=>el.classList.toggle("active",el.id==="page-"+page));
+  document.querySelectorAll(".nav button[data-page]").forEach(el=>el.classList.toggle("active",el.dataset.page===page));
+  const names={overview:"Overview",venues:"Venues",qr:"QR Management",bookings:"Booking History",reports:"Reports"};
+  $("pageTitle").textContent=names[page]||"Overview";
+}
+document.querySelectorAll(".nav button[data-page]").forEach(btn=>btn.addEventListener("click",()=>goPage(btn.dataset.page)));
+document.querySelectorAll("[data-goto]").forEach(btn=>btn.addEventListener("click",()=>goPage(btn.dataset.goto)));
+
+$("googleLoginBtn").addEventListener("click",async()=>{
+  hideNotice("loginNotice");
+  $("googleLoginBtn").disabled=true;
+  $("googleLoginBtn").textContent="Opening Google sign-in…";
+  try{await auth.signInWithPopup(googleProvider);}
+  catch(error){
+    showNotice("loginNotice",error.message||"Google sign-in failed.","error");
+  }finally{
+    $("googleLoginBtn").disabled=false;
+    $("googleLoginBtn").textContent="Continue with Google";
+  }
+});
+$("logoutBtn").addEventListener("click",()=>auth.signOut());
+
+auth.onAuthStateChanged(user=>{
+  if(!user){
+    currentUser=null;initialized=false;stopListeners();
+    $("app").classList.add("hidden");$("loginScreen").classList.remove("hidden");
+    return;
+  }
+  const email=String(user.email||"").trim().toLowerCase();
+  if(email!==ADMIN_EMAIL.toLowerCase()){
+    auth.signOut();
+    showNotice("loginNotice","This Google account is not authorized for ParkSmart Admin.","error");
+    return;
+  }
+  currentUser=user;
+  $("userEmail").textContent=user.email||"";
+  $("loginScreen").classList.add("hidden");$("app").classList.remove("hidden");
+  if(!initialized){initialized=true;startListeners();}
+});
+
+$("venueForm").addEventListener("submit",async e=>{
+  e.preventDefault();hideNotice("globalNotice");
+  const name=$("venueName").value.trim();
+  const address=$("venueAddress").value.trim();
+  const slotCount=Number($("venueSlots").value);
+  const mode=$("venueMode").value;
+  if(!name||!Number.isInteger(slotCount)||slotCount<1||slotCount>500){
+    showNotice("globalNotice","Enter a venue name and a valid slot count (1–500).","error");return;
+  }
+  if(mode==="LIVE_ESP32"){
+    if(slotCount!==4){showNotice("globalNotice","The current ESP32 demo supports exactly 4 slots.","error");return;}
+    if(Object.values(venues).some(v=>String(v.mode||"").toUpperCase()==="LIVE_ESP32")){
+      showNotice("globalNotice","Only one LIVE ESP32 demo venue is allowed.","error");return;
+    }
+  }
+  try{
+    await db.ref("parksmart/venues").push({
+      name,address,slotCount,mode,createdAt:Date.now(),createdBy:currentUser.email
+    });
+    $("venueForm").reset();$("venueSlots").value=4;
+    showNotice("globalNotice","Venue added successfully.","success");
+  }catch(error){showNotice("globalNotice","Could not add venue: "+error.message,"error");}
+});
+
+$("venueList").addEventListener("click",async e=>{
+  const btn=e.target.closest("[data-delete-venue]");
+  if(!btn)return;
+  const id=btn.dataset.deleteVenue;
+  if(!confirm("Delete this venue? Existing QR locations and booking records will not be deleted."))return;
+  try{
+    await db.ref("parksmart/venues/"+id).remove();
+    showNotice("globalNotice","Venue deleted.","success");
+  }catch(error){showNotice("globalNotice","Delete failed: "+error.message,"error");}
+});
+
+$("qrForm").addEventListener("submit",async e=>{
+  e.preventDefault();hideNotice("globalNotice");
+  const venueId=$("qrVenue").value;
+  const venue=venues[venueId];
+  const label=$("qrLabel").value.trim();
+  if(!venue){showNotice("globalNotice","Please add and select a venue first.","error");return;}
+  if(!label){showNotice("globalNotice","Enter a location label.","error");return;}
+  try{
+    const ref=db.ref("parksmart/locations").push();
+    const url=`${CONSUMER_URL}?locationId=${encodeURIComponent(ref.key)}`;
+    await ref.set({
+      venueId,venueName:venue.name||"Venue",label,
+      floor:$("qrFloor").value.trim(),
+      zone:$("qrZone").value.trim(),
+      pillar:$("qrPillar").value.trim(),
+      locationType:$("qrType").value,
+      url,createdAt:Date.now(),createdBy:currentUser.email
+    });
+    $("qrForm").reset();
+    showNotice("globalNotice","QR location created successfully.","success");
+  }catch(error){showNotice("globalNotice","QR generation failed: "+error.message,"error");}
+});
+$("refreshQRBtn").addEventListener("click",renderQRs);
+
+$("qrList").addEventListener("click",async e=>{
+  const download=e.target.closest("[data-download-qr]");
+  const del=e.target.closest("[data-delete-qr]");
+  if(download){
+    const id=download.dataset.downloadQr;
+    const target=$("qr-"+id);
+    const img=target?.querySelector("img");
+    const canvas=target?.querySelector("canvas");
+    const data=img?.src||(canvas?canvas.toDataURL("image/png"):null);
+    if(!data){showNotice("globalNotice","QR image is not ready yet.","error");return;}
+    const a=document.createElement("a");a.href=data;a.download=`parksmart-${id}.png`;a.click();
+  }
+  if(del){
+    const id=del.dataset.deleteQr;
+    if(!confirm("Delete this QR location? The printed QR will no longer resolve to a saved location."))return;
+    try{await db.ref("parksmart/locations/"+id).remove();showNotice("globalNotice","QR location deleted.","success");}
+    catch(error){showNotice("globalNotice","Could not delete QR: "+error.message,"error");}
+  }
+});
+
+$("bookingSearch").addEventListener("input",renderBookings);
+$("bookingFilter").addEventListener("change",renderBookings);
+$("clearBookingsBtn").addEventListener("click",async()=>{
+  if(!confirm("This clears the Firebase booking records used by the Consumer page too. Continue?"))return;
+  try{await db.ref("parksmart/bookings").remove();showNotice("globalNotice","Booking records cleared.","success");}
+  catch(error){showNotice("globalNotice","Could not clear records: "+error.message,"error");}
+});
+$("exportCSVBtn").addEventListener("click",()=>{
+  const rows=bookingRows();
+  const header=["Slot","Name","Vehicle","Venue","Status","Created","Email"];
+  const data=rows.map(({b,slot,status})=>[
+    slot,b.name||"",b.vehicle||"",bookingVenue(b),status,formatDate(b.createdAt),b.email||""
+  ]);
+  const csv=[header,...data].map(row=>row.map(v=>`"${String(v??"").replace(/"/g,'""')}"`).join(",")).join("\r\n");
+  const blob=new Blob(["\uFEFF"+csv],{type:"text/csv;charset=utf-8;"});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement("a");a.href=url;a.download="parksmart-booking-report.csv";a.click();
+  URL.revokeObjectURL(url);
+});
+</script>
+</body>
+</html>
