@@ -1,15 +1,309 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>ParkSmart | Consumer</title><link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet"><style>
-:root{--bg:#080f20;--panel:#111e34;--line:#263a59;--text:#eef5ff;--muted:#91a4c0;--blue:#4388ff;--cyan:#39d5e8;--green:#35d49a;--red:#ff7185;--amber:#ffc66d}*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 80% -10%,#1a3a66,transparent 38%),var(--bg);color:var(--text);font-family:'DM Sans',sans-serif}.layout{display:flex;min-height:100vh}.side{width:250px;background:#0b1529;border-right:1px solid var(--line);padding:26px 19px;display:flex;flex-direction:column}.brand{display:flex;gap:11px;align-items:center;margin:0 7px 35px}.logo{background:linear-gradient(135deg,var(--blue),var(--cyan));width:42px;height:42px;border-radius:13px;display:grid;place-items:center}.brand b{font:700 20px 'Space Grotesk'}.brand small{display:block;color:var(--muted);font-size:10px;letter-spacing:1.5px}.label{font-size:10px;letter-spacing:1.8px;color:#607493;padding:0 12px}.nav a{display:flex;gap:12px;align-items:center;padding:13px 12px;margin:5px 0;border-radius:11px;text-decoration:none;color:#9eb1ce;font-weight:600;font-size:14px}.nav a.active,.nav a:hover{background:#18365f;color:white;box-shadow:inset 3px 0 var(--cyan)}.sidebottom{margin-top:auto;border:1px solid var(--line);padding:14px;border-radius:13px;color:var(--muted);font-size:12px}.sidebottom b{display:block;color:white;margin-bottom:4px}.main{flex:1;padding:32px clamp(18px,4vw,55px);max-width:1450px;margin:auto;width:100%}.header{display:flex;justify-content:space-between;align-items:center;margin-bottom:25px;gap:12px}.eyebrow{font-size:11px;color:var(--cyan);font-weight:700;letter-spacing:2px}.header h1{font:700 32px 'Space Grotesk';margin:8px 0}.muted{color:var(--muted);font-size:13px}.badge{border:1px solid #285b54;background:#102b30;color:#7de6c4;padding:10px 14px;border-radius:25px;font-size:12px;font-weight:700;white-space:nowrap}.context{border:1px solid #31527c;border-radius:18px;padding:20px 22px;background:linear-gradient(110deg,#142d50,#102139);display:flex;justify-content:space-between;align-items:center;gap:15px;margin-bottom:25px}.context h2{font:600 17px 'Space Grotesk';margin:0}.context p{margin:6px 0 0;color:#9eb2ce;font-size:13px}.tag{border-radius:30px;padding:8px 12px;font-size:11px;font-weight:700;background:#1b3558;color:#b9d8ff;white-space:nowrap}.section{font:600 19px 'Space Grotesk';margin:28px 0 14px}.slots{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}.slot,.panel{background:linear-gradient(145deg,#14223b,#101a2e);border:1px solid var(--line);border-radius:17px;padding:19px;box-shadow:0 15px 35px #02081766}.slothead{display:flex;justify-content:space-between;align-items:center}.slotnum{font:600 15px 'Space Grotesk'}.car{width:53px;height:53px;border-radius:15px;background:#1c385f;display:grid;place-items:center;color:#77dced;margin:18px 0 13px}.car svg{width:34px;height:34px}.state{font-size:12px;font-weight:700;letter-spacing:.5px}.available{color:var(--green)}.occupied{color:var(--red)}.reserved{color:var(--amber)}.unknown{color:var(--muted)}.slot small{display:block;color:var(--muted);font-size:12px;margin-top:6px;min-height:17px}.btn{border:0;border-radius:10px;padding:11px 13px;background:linear-gradient(100deg,var(--blue),#2874df);color:#fff;font:700 12px 'DM Sans';cursor:pointer;margin-top:15px;width:100%}.btn:hover{filter:brightness(1.12)}.btn:disabled{opacity:.4;cursor:not-allowed}.btn.secondary{background:#213754;border:1px solid #365273}.btn.danger{background:#57283a;border:1px solid #854158}.tools{display:grid;grid-template-columns:1fr 1fr;gap:15px}.panel h3{font:600 17px 'Space Grotesk';margin:0 0 8px}.panel p{color:var(--muted);font-size:13px;line-height:1.6;margin:0}.panel .btn{width:auto;min-width:165px}.result{margin-top:13px;padding:13px;border:1px solid #294362;background:#0d192d;border-radius:12px;color:#c9d9ef;font-size:13px;line-height:1.6;display:none}.result.show{display:block}.row{display:flex;gap:10px;flex-wrap:wrap}.row .btn{flex:1}.foot{border-top:1px solid var(--line);margin-top:35px;padding-top:17px;color:#7185a4;font-size:12px}@media(max-width:950px){.slots{grid-template-columns:repeat(2,1fr)}}@media(max-width:650px){.layout{display:block}.side{width:100%;padding:13px 15px;border-right:0;border-bottom:1px solid var(--line)}.brand{margin:0}.label,.sidebottom{display:none}.nav{display:flex;gap:4px;overflow:auto;margin-top:10px}.nav a{white-space:nowrap;padding:9px 11px;font-size:12px}.main{padding:22px 15px}.header h1{font-size:27px}.badge{font-size:0;padding:10px}.context{padding:16px}.slots{gap:10px}.slot{padding:14px}.tools{grid-template-columns:1fr}.panel .btn{width:100%}}
-</style></head><body><div class="layout"><aside class="side"><div class="brand"><div class="logo"><svg viewBox="0 0 24 24" width="25" fill="none" stroke="white" stroke-width="2"><path d="M3 13h18l-2-6H5l-2 6Z"/><path d="M5 13v5m14-5v5M7 18h10M7 7l1-3h8l1 3"/></svg></div><div><b>ParkSmart</b><small>SMART PARKING</small></div></div><div class="label">WORKSPACE</div><nav class="nav"><a href="index.html">▦ &nbsp; Overview</a><a href="hardware.html">▤ &nbsp; Hardware</a><a class="active" href="consumer.html">♙ &nbsp; Consumer</a><a href="admin.html">⬡ &nbsp; Admin</a></nav><div class="sidebottom"><b>Your parking space</b>Book · Save · Find</div></aside><main class="main"><header class="header"><div><div class="eyebrow">PARKSMART / CONSUMER</div><h1>Find your parking</h1><div class="muted">Book a slot and keep your vehicle location handy.</div></div><div class="badge">● &nbsp; CONSUMER PORTAL</div></header><section class="context"><div><h2 id="venueTitle">Choose your parking space</h2><p id="venueSub">Live availability · Easy booking · Find your vehicle</p></div><span class="tag" id="locationTag">GENERAL PARKING</span></section><div class="section">Available parking slots <span class="muted">/ 04</span></div><section class="slots" id="slots"><div class="slot">Loading slot details…</div></section><div class="section">Your parking tools</div><section class="tools"><article class="panel"><h3>Save My Parking</h3><p>Save your current slot or QR-selected parking location to your account.</p><button class="btn" id="saveBtn">Save My Parking</button><div class="result" id="saveResult"></div></article><article class="panel"><h3>Find My Vehicle</h3><p>Retrieve the parking location you saved earlier.</p><button class="btn secondary" id="findBtn">Find My Vehicle</button><div class="result" id="findResult"></div></article></section><footer class="foot">ParkSmart · Your parking details are saved to Firebase.</footer></main></div>
-<script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-app-compat.js"></script><script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-auth-compat.js"></script><script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-database-compat.js"></script><script>
-const firebaseConfig={apiKey:"AIzaSyAsffyVnKES_-tZz3pnuojPLPFBk3TJe5",authDomain:"smartpark-9ecbb.firebaseapp.com",databaseURL:"https://smartpark-9ecbb-default-rtdb.asia-southeast1.firebasedatabase.app",projectId:"smartpark-9ecbb",storageBucket:"smartpark-9ecbb.firebasestorage.app",messagingSenderId:"423958538578",appId:"1:423958538578:web:b7c5395f8348e3a00f728b"};firebase.initializeApp(firebaseConfig);const auth=firebase.auth(),db=firebase.database();let user=null,venueContext={venueId:'',venueName:'',label:'',locationId:''},slotsData={},bookingsData={};const carSvg='<svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m7 23 3-9h20l3 9v9H7zM10 23h20M13 14l2-5h10l2 5"/><circle cx="12" cy="29" r="2"/><circle cx="28" cy="29" r="2"/></svg>';
-const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));function show(id,msg){const el=document.getElementById(id);el.innerHTML=msg;el.classList.add('show')}
-async function loadQrContext(){const locationId=new URLSearchParams(location.search).get('locationId');if(!locationId)return;venueContext.locationId=locationId;try{const snap=await db.ref('parksmart/locations/'+locationId).once('value');if(!snap.exists()){document.getElementById('venueSub').textContent='This QR location could not be found. Please contact the parking administrator.';return}const q=snap.val();venueContext={...venueContext,venueId:q.venueId||'',venueName:q.venueName||'',label:q.label||''};if(q.venueId){const v=await db.ref('parksmart/venues/'+q.venueId).once('value');if(v.exists())venueContext.venueName=v.val().name||venueContext.venueName}document.getElementById('venueTitle').textContent=venueContext.venueName||'Selected parking location';document.getElementById('venueSub').textContent=venueContext.label?`QR location: ${venueContext.label}`:'Your QR parking location is selected.';document.getElementById('locationTag').textContent='QR LOCATION LOADED'}catch(e){console.error(e);document.getElementById('venueSub').textContent='Unable to load QR location. Check your connection.'}}
-function renderSlots(){document.getElementById('slots').innerHTML=[1,2,3,4].map(n=>{const id='slot'+n,raw=String(slotsData[id]||'UNKNOWN').toUpperCase(),b=bookingsData[id],active=b&&b.status==='ACTIVE';let label=raw.includes('OCCUPIED')?'OCCUPIED':active?'RESERVED':raw.includes('AVAILABLE')?'AVAILABLE':'UNKNOWN';let cls=label.toLowerCase();const mine=active&&b.uid===user.uid;let button=label==='AVAILABLE'?`<button class="btn" onclick="bookSlot('${id}')">Book My Slot</button>`:mine?`<button class="btn danger" onclick="cancelBooking('${id}')">Cancel My Booking</button>`:`<button class="btn secondary" disabled>${label==='RESERVED'?'Already reserved':label==='OCCUPIED'?'Slot occupied':'Not available'}</button>`;return `<article class="slot"><div class="slothead"><div class="slotnum">SLOT 0${n}</div><span class="tag">${id.toUpperCase()}</span></div><div class="car">${carSvg}</div><div class="state ${cls}">${label}</div><small>${label==='AVAILABLE'?'Ready for booking':mine?'Booked by you':label==='RESERVED'?'Reserved by another user':label==='OCCUPIED'?'Vehicle detected':'Waiting for sensor data'}</small>${button}</article>`}).join('')}
-async function bookSlot(id){if(!user)return alert('Please wait while your account connects.');const name=prompt('Enter your name:');if(!name||!name.trim())return;const vehicle=prompt('Enter vehicle number:');if(!vehicle||!vehicle.trim())return;const ref=db.ref('parksmart/bookings/'+id);try{const result=await ref.transaction(current=>{if(current&&current.status==='ACTIVE')return;return{uid:user.uid,name:name.trim(),email:user.email||'',vehicle:vehicle.trim().toUpperCase(),slot:id,status:'ACTIVE',createdAt:Date.now(),venueId:venueContext.venueId||'',venueName:venueContext.venueName||'ParkSmart'}});if(!result.committed)alert('Sorry, this slot has just been booked by someone else.');else alert(id.toUpperCase()+' booked successfully!');}catch(e){alert('Booking failed: '+e.message)}}
-async function cancelBooking(id){const b=bookingsData[id];if(!b||b.uid!==user.uid||b.status!=='ACTIVE')return alert('You can cancel only your own active booking.');if(!confirm('Cancel your '+id.toUpperCase()+' booking?'))return;try{await db.ref('parksmart/bookings/'+id).update({status:'CANCELLED',cancelledAt:Date.now()});alert('Booking cancelled.')}catch(e){alert('Cancellation failed: '+e.message)}}
-async function saveParking(){if(!user)return;let slot=Object.keys(bookingsData).find(k=>bookingsData[k]?.uid===user.uid&&bookingsData[k]?.status==='ACTIVE')||'';if(!venueContext.locationId&&!slot){slot=prompt('Enter the slot number you parked in (for example, slot2):')||'';slot=slot.toLowerCase().replace(/[^a-z0-9]/g,'');if(!/^slot[1-4]$/.test(slot))return alert('Please enter slot1, slot2, slot3 or slot4.')}const record={uid:user.uid,venueId:venueContext.venueId||'',venueName:venueContext.venueName||'ParkSmart',locationId:venueContext.locationId||'',label:venueContext.label||(slot?slot.toUpperCase():''),slot:slot||'',savedAt:Date.now()};try{await db.ref('parksmart/vehicleLocations/'+user.uid).set(record);show('saveResult',`<b>Parking saved successfully.</b><br>${esc(record.venueName)} · ${esc(record.label||'QR location')}`)}catch(e){show('saveResult','Unable to save: '+esc(e.message))}}
-async function findParking(){if(!user)return;try{const s=await db.ref('parksmart/vehicleLocations/'+user.uid).once('value');if(!s.exists())return show('findResult','No saved parking location found yet. Use Save My Parking first.');const d=s.val();let venue=d.venueName||'ParkSmart';let label=d.label||d.slot||'Saved location';let html=`<b>${esc(venue)}</b><br>${esc(label)}<br><span style="color:#91a4c0">Saved ${new Date(d.savedAt).toLocaleString()}</span>`;if(d.venueId){const v=await db.ref('parksmart/venues/'+d.venueId).once('value');const address=v.val()?.address;if(address)html+=`<br>${esc(address)}<br><a style="color:#70cfff" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}">Open directions in Google Maps ↗</a>`}show('findResult',html)}catch(e){show('findResult','Unable to find location: '+esc(e.message))}}
-document.getElementById('saveBtn').addEventListener('click',saveParking);document.getElementById('findBtn').addEventListener('click',findParking);
-auth.signInAnonymously().then(async cred=>{user=cred.user;await loadQrContext();db.ref('parksmart/slots').on('value',s=>{slotsData=s.val()||{};renderSlots()});db.ref('parksmart/bookings').on('value',s=>{bookingsData=s.val()||{};renderSlots()})}).catch(e=>{console.error(e);document.getElementById('slots').innerHTML='<div class="panel">Could not connect to Firebase. Please check your internet connection and Firebase authentication settings.</div>'});
-</script></body></html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ParkSmart | Consumer Dashboard</title>
+<script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-database-compat.js"></script>
+<style>
+:root{--bg:#061225;--nav:#041126;--line:#203d5b;--cyan:#4bd4ff;--muted:#a9bdd5;--white:#f5f9ff}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--white);font-family:Inter,"Segoe UI",Arial,sans-serif}
+a{color:inherit;text-decoration:none}button,input{font:inherit}
+.layout{display:grid;grid-template-columns:240px 1fr;min-height:100vh}
+aside{background:var(--nav);border-right:1px solid #1b2c43;padding:25px 17px}
+.brand{font-size:22px;font-weight:850;color:#60d7ff;margin:0 0 35px}
+nav a{display:block;padding:13px 14px;border-radius:11px;color:var(--muted);margin:5px 0}
+nav a.active,nav a:hover{background:#102c49;color:var(--cyan)}
+main{padding:34px;min-width:0}.top{display:flex;justify-content:space-between;align-items:center;gap:15px;flex-wrap:wrap}
+.kicker{color:var(--cyan);font-size:11px;font-weight:900;letter-spacing:1.8px}
+h1{font-size:32px;margin:9px 0}.muted{color:var(--muted);font-size:14px}
+.pill{padding:9px 13px;border-radius:30px;background:#123b35;color:#67f2c5;font-size:12px;font-weight:800}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;margin-top:25px}
+.card,.panel{background:linear-gradient(145deg,#102c49,#081a30);border:1px solid var(--line);border-radius:20px;padding:23px;min-width:0}
+.cardhead{display:flex;justify-content:space-between;align-items:center}
+.caricon{width:58px;height:58px;border-radius:16px;background:#12466a;display:grid;place-items:center;color:#a6eaff}
+.caricon svg{width:35px;height:35px}
+.status{font-size:11px;font-weight:850;padding:8px 12px;border-radius:30px;background:#123b35;color:#67f2c5}
+.status.occupied{background:#48252e;color:#ff9ba9}.status.reserved{background:#45371d;color:#ffd77c}
+.card h2{font-size:21px;margin:22px 0 7px}.slotid{color:#7f9bb9;font-size:12px;letter-spacing:1px}
+.row{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
+.btn{border:0;border-radius:11px;padding:12px 15px;background:linear-gradient(110deg,#12b9f5,#0872ed);color:#fff;font-weight:800;cursor:pointer}
+.btn.secondary{background:#102c49;border:1px solid #315273}.btn:disabled{opacity:.45;cursor:not-allowed}
+.panel{margin-top:22px}.panel h2{margin:10px 0}.notice{color:var(--muted);font-size:13px;line-height:1.5}
+.field{width:100%;padding:12px;border:1px solid #315273;background:#07172b;color:#fff;border-radius:10px;margin:7px 0 12px}
+.formgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:760px){.layout{grid-template-columns:1fr}aside{padding:15px;border-right:0;border-bottom:1px solid #1b2c43}.brand{margin:0 0 12px}nav{display:flex;gap:5px;flex-wrap:wrap}nav a{padding:9px 11px;margin:0}main{padding:20px}.grid{grid-template-columns:1fr}h1{font-size:27px}}
+@media(max-width:560px){.formgrid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="layout">
+<aside>
+  <div class="brand">▣ ParkSmart</div>
+  <nav>
+    <a href="index.html">Home</a>
+    <a class="active" href="consumer.html">Consumer</a>
+    <a href="hardware.html">Hardware</a>
+    <a href="admin.html">Admin</a>
+  </nav>
+</aside>
+
+<main>
+  <header class="top">
+    <div>
+      <div class="kicker">YOUR PARKING WORKSPACE</div>
+      <h1>Consumer Dashboard</h1>
+      <div class="muted" id="venueLine">Find a slot, book it, and save your parking location.</div>
+    </div>
+    <span class="pill" id="authState">Connecting…</span>
+  </header>
+
+  <section class="grid" id="slots"></section>
+
+  <section class="panel">
+    <div class="kicker">PARKING MEMORY</div>
+    <h2>Save My Parking</h2>
+    <p class="notice">Save the selected QR location or your active booking to Firebase.</p>
+
+    <div class="formgrid">
+      <div>
+        <label class="notice" for="saveLabel">Parking label</label>
+        <input class="field" id="saveLabel" placeholder="e.g. Level 2, Slot 4">
+      </div>
+      <div>
+        <label class="notice" for="saveAddress">Venue / address</label>
+        <input class="field" id="saveAddress" placeholder="Venue name or address">
+      </div>
+    </div>
+
+    <div class="row">
+      <button class="btn" id="saveBtn">Save My Parking</button>
+      <button class="btn secondary" id="findBtn">Find My Vehicle</button>
+    </div>
+    <div id="savedResult" class="notice" style="margin-top:14px"></div>
+  </section>
+</main>
+</div>
+
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyAsffyVnKES_-tZz3pnuojPLPFBk3TJe5E",
+  authDomain: "smartpark-9ecbb.firebaseapp.com",
+  databaseURL: "https://smartpark-9ecbb-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "smartpark-9ecbb",
+  storageBucket: "smartpark-9ecbb.firebasestorage.app",
+  messagingSenderId: "423958538578",
+  appId: "1:423958538578:web:b7c5395f8348e3a00f728b"
+};
+
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.database();
+
+let user = null;
+let slotData = {};
+let bookings = {};
+let qrLocation = null;
+
+const slotIds = ["slot1","slot2","slot3","slot4"];
+
+const carSvg = `
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+     stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+  <path d="m3 13 2-6h14l2 6v6H3z"/>
+  <path d="M5 13h14M7 17h.01M17 17h.01M7 7l1-3h8l1 3"/>
+</svg>`;
+
+function activeBooking(slotId) {
+  return Object.entries(bookings).find(
+    ([key,b]) => b && b.slot === slotId && b.status === "ACTIVE"
+  );
+}
+
+function renderSlots() {
+  document.getElementById("slots").innerHTML = slotIds.map((id,index) => {
+    const sensor = String(slotData[id] || "UNKNOWN").toUpperCase();
+    const active = activeBooking(id);
+    const reserved = Object.values(bookings).some(
+      b => b && b.slot === id && b.status === "ACTIVE"
+    );
+
+    const state = sensor === "OCCUPIED" ? "OCCUPIED"
+      : reserved ? "RESERVED"
+      : sensor === "AVAILABLE" ? "AVAILABLE"
+      : "UNKNOWN";
+
+    const cls = state === "OCCUPIED" ? "occupied"
+      : state === "RESERVED" ? "reserved" : "";
+
+    const isMine = active && active[1].uid === user.uid;
+    const action = isMine
+      ? `<button class="btn secondary" onclick="cancelBooking('${active[0]}')">Cancel Booking</button>`
+      : state === "AVAILABLE"
+        ? `<button class="btn" onclick="bookSlot('${id}')">Book My Slot</button>`
+        : `<button class="btn" disabled>Not Available</button>`;
+
+    return `
+      <article class="card">
+        <div class="cardhead">
+          <span class="caricon">${carSvg}</span>
+          <span class="status ${cls}">${state}</span>
+        </div>
+        <h2>Parking Slot ${index + 1}</h2>
+        <div class="slotid">${id.toUpperCase()} · Sensor: ${sensor}</div>
+        <div class="row">
+          ${action}
+          <button class="btn secondary" onclick="selectSlot('${id}')">Save My Parking</button>
+        </div>
+      </article>`;
+  }).join("");
+}
+
+async function bookSlot(slotId) {
+  const ref = db.ref("parksmart/bookings/" + slotId);
+  try {
+    const result = await ref.transaction(current => {
+      if (current && current.status === "ACTIVE") return;
+      return {
+        uid: user.uid,
+        name: user.displayName || user.email || "ParkSmart user",
+        email: user.email || "",
+        vehicle: "",
+        slot: slotId,
+        status: "ACTIVE",
+        createdAt: Date.now(),
+        venueId: qrLocation?.venueId || "",
+        venueName: qrLocation?.venueName || "ParkSmart"
+      };
+    });
+    if (!result.committed) alert("This slot is already booked.");
+  } catch (error) {
+    alert(error.message);
+  }
+}
+
+async function cancelBooking(slotId) {
+  const ref = db.ref("parksmart/bookings/" + slotId);
+  const snapshot = await ref.get();
+  const booking = snapshot.val();
+
+  if (!booking || booking.uid !== user.uid) {
+    alert("You can cancel only your own booking.");
+    return;
+  }
+
+  await ref.update({
+    status: "CANCELLED",
+    cancelledAt: Date.now()
+  });
+}
+
+function selectSlot(slotId) {
+  document.getElementById("saveLabel").value =
+    (qrLocation?.label ? qrLocation.label + " · " : "") + slotId.toUpperCase();
+
+  document.getElementById("saveAddress").value =
+    qrLocation?.venueName || "";
+
+  document.getElementById("savedResult").textContent =
+    "Slot selected. Tap Save My Parking to store it.";
+}
+
+document.getElementById("saveBtn").onclick = async () => {
+  const active = Object.values(bookings).find(
+    b => b && b.uid === user.uid && b.status === "ACTIVE"
+  );
+
+  const label = document.getElementById("saveLabel").value.trim()
+    || qrLocation?.label
+    || active?.slot
+    || "";
+
+  if (!label) {
+    alert("Select a slot or enter a parking label.");
+    return;
+  }
+
+  const record = {
+    label,
+    address: document.getElementById("saveAddress").value.trim()
+      || qrLocation?.venueName || "",
+    venueId: qrLocation?.venueId || active?.venueId || "",
+    venueName: qrLocation?.venueName || active?.venueName || "",
+    slot: active?.slot || "",
+    savedAt: Date.now()
+  };
+
+  await db.ref("parksmart/vehicleLocations/" + user.uid).set(record);
+  document.getElementById("savedResult").textContent =
+    "Parking location saved to Firebase: " + label;
+};
+
+document.getElementById("findBtn").onclick = async () => {
+  const snapshot = await db.ref(
+    "parksmart/vehicleLocations/" + user.uid
+  ).get();
+
+  const saved = snapshot.val();
+
+  if (!saved) {
+    document.getElementById("savedResult").textContent =
+      "No saved parking location found.";
+    return;
+  }
+
+  let result = `Saved location: ${saved.label} · ${saved.venueName || saved.address || ""}`;
+
+  if (saved.address) {
+    result += ` · <a style="color:#55d8ff" target="_blank" rel="noopener"
+      href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(saved.address)}">Directions ↗</a>`;
+  }
+
+  document.getElementById("savedResult").innerHTML = result;
+};
+
+async function loadQrLocation() {
+  const locationId = new URLSearchParams(location.search).get("locationId");
+  if (!locationId) return;
+
+  const snapshot = await db.ref("parksmart/locations/" + locationId).get();
+  qrLocation = snapshot.val();
+
+  if (!qrLocation) {
+    document.getElementById("venueLine").textContent =
+      "QR location not found in Firebase.";
+    return;
+  }
+
+  document.getElementById("venueLine").textContent =
+    `${qrLocation.venueName || "Parking venue"} · ${qrLocation.label || "Selected location"}`;
+
+  document.getElementById("saveLabel").value = qrLocation.label || "";
+  document.getElementById("saveAddress").value = qrLocation.venueName || "";
+}
+
+auth.signInAnonymously().then(async credential => {
+  user = credential.user;
+  document.getElementById("authState").textContent = "● Signed in";
+
+  await loadQrLocation();
+
+  db.ref("parksmart/slots").on("value", snapshot => {
+    slotData = snapshot.val() || {};
+    renderSlots();
+  });
+
+  db.ref("parksmart/bookings").on("value", snapshot => {
+    bookings = snapshot.val() || {};
+    renderSlots();
+  });
+}).catch(error => {
+  document.getElementById("authState").textContent = "Auth error";
+  document.getElementById("slots").innerHTML =
+    `<article class="card">${error.message}</article>`;
+});
+</script>
+</body>
+</html>
