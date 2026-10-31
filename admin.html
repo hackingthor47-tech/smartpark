@@ -12,6 +12,7 @@
   --yellow:#ffca63;--red:#ff6b7a;--radius:16px;
 }
 *{box-sizing:border-box}
+[hidden]{display:none!important}
 body{margin:0;background:var(--bg);color:var(--text);font:14px/1.5 Inter,system-ui,Segoe UI,Arial,sans-serif}
 button,input,select,textarea{font:inherit}
 button{cursor:pointer}
@@ -62,9 +63,9 @@ td{font-size:13px}tbody tr:last-child td{border-bottom:0}
 .dot{width:7px;height:7px;border-radius:50%;background:currentColor}
 .slot-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
 .slot{border:1px solid var(--line);border-radius:12px;padding:14px;background:#091a2d}
-.slot strong{display:block;font-size:15px;margin-bottom:8px}.slot small{color:var(--muted)}
+.slot strong{display:block;font-size:15px;margin-bottom:8px}.slot small{display:block;color:var(--muted);margin-top:7px}
 .qr-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
-.qr-card{border:1px solid var(--line);border-radius:13px;padding:14px;background:#091a2d}
+.qr-card{border:1px solid var(--line);border-radius:13px;padding:14px;background:#091a2d;min-width:0}
 .qr-image{display:grid;place-items:center;background:white;border-radius:10px;padding:10px;margin:12px 0;min-height:170px}
 .qr-image img{width:150px;height:150px;object-fit:contain}
 .qr-image canvas{max-width:100%;height:auto}
@@ -226,29 +227,25 @@ td{font-size:13px}tbody tr:last-child td{border-bottom:0}
 
 <div id="toast" class="toast" hidden></div>
 
-<!-- Firebase compat SDKs -->
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-database-compat.js"></script>
-<!-- QRCode.js -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
 <script>
 (() => {
   "use strict";
 
-  // Keep this Firebase project config aligned with your existing ParkSmart hardware app.
   const firebaseConfig = {
-  apiKey: "AIzaSyAsffyVnKES_-tZz3pnuojPLPFBk3TJe5E",
-  authDomain: "smartpark-9ecbb.firebaseapp.com",
-  databaseURL: "https://smartpark-9ecbb-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "smartpark-9ecbb",
-  storageBucket: "smartpark-9ecbb.firebasestorage.app",
-  messagingSenderId: "423958538578",
-  appId: "1:423958538578:web:b7c5395f8348e3a00f728b"
+    apiKey: "AIzaSyAsffyVnKES_-tZz3pnuojPLPFBk3TJe5E",
+    authDomain: "smartpark-9ecbb.firebaseapp.com",
+    databaseURL: "https://smartpark-9ecbb-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "smartpark-9ecbb",
+    storageBucket: "smartpark-9ecbb.firebasestorage.app",
+    messagingSenderId: "423958538578",
+    appId: "1:423958538578:web:b7c5395f8348e3a00f728b"
   };
 
-  // Add the exact Google account(s) allowed to access this admin page.
   const ADMIN_EMAILS = ["hackingthor47@gmail.com"];
 
   const PATHS = {
@@ -260,7 +257,11 @@ td{font-size:13px}tbody tr:last-child td{border-bottom:0}
   };
 
   const $ = id => document.getElementById(id);
-  const state = { user:null, db:null, auth:null, venues:{}, bookings:{}, locations:{}, slots:{}, qrCodes:{}, currentQr:null, listeners:[] };
+  const state = {
+    user:null, db:null, auth:null,
+    venues:{}, bookings:{}, locations:{}, slots:{}, qrCodes:{},
+    currentQr:null, listeners:[]
+  };
 
   function toast(message, isError=false) {
     const el = $("toast");
@@ -270,23 +271,33 @@ td{font-size:13px}tbody tr:last-child td{border-bottom:0}
     clearTimeout(toast.timer);
     toast.timer = setTimeout(() => el.hidden = true, 3500);
   }
+
   function showNotice(message, type="info") {
     const el = $("globalNotice");
     el.textContent = message;
     el.className = "notice" + (type === "error" ? " error" : type === "success" ? " success" : "");
     el.hidden = false;
   }
+
   function escapeHtml(value) {
-    return String(value ?? "").replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]));
+    return String(value ?? "").replace(/[&<>"']/g, c => ({
+      "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;"
+    }[c]));
   }
+
+  // Keep primitive values such as "AVAILABLE" as well as object records.
   function asEntries(value) {
-    if (!value || typeof value !== "object") return [];
-    return Object.entries(value).filter(([,v]) => v && typeof v === "object");
+    if (!value || typeof value !== "object" || Array.isArray(value)) return [];
+    return Object.entries(value).filter(([,v]) => v !== null && v !== undefined);
   }
+
   function val(obj, ...keys) {
-    for (const key of keys) if (obj && obj[key] !== undefined && obj[key] !== null && obj[key] !== "") return obj[key];
+    for (const key of keys) {
+      if (obj && obj[key] !== undefined && obj[key] !== null && obj[key] !== "") return obj[key];
+    }
     return "";
   }
+
   function normalizeStatus(value) {
     const s = String(value || "").toLowerCase();
     if (s.includes("occup")) return "occupied";
@@ -294,44 +305,66 @@ td{font-size:13px}tbody tr:last-child td{border-bottom:0}
     if (s.includes("avail") || s === "free") return "available";
     if (s.includes("cancel")) return "cancelled";
     if (s.includes("complete") || s.includes("finish")) return "completed";
+    if (s.includes("expire")) return "expired";
     return s || "unknown";
   }
+
   function statusBadge(status) {
     const s = normalizeStatus(status);
-    const cls = s === "available" ? "green" : s === "occupied" || s === "cancelled" ? "red" : s === "reserved" || s === "active" ? "yellow" : s === "completed" ? "blue" : "";
+    const cls = s === "available" ? "green"
+      : s === "occupied" || s === "cancelled" ? "red"
+      : s === "reserved" || s === "active" ? "yellow"
+      : s === "completed" ? "blue" : "";
     return `<span class="badge ${cls}"><span class="dot"></span>${escapeHtml(s)}</span>`;
   }
+
+  function timestampNumber(value) {
+    if (value === null || value === undefined || value === "") return 0;
+    if (typeof value === "number") return value < 1e12 ? value * 1000 : value;
+    if (/^\d+$/.test(String(value))) {
+      const n = Number(value);
+      return n < 1e12 ? n * 1000 : n;
+    }
+    const parsed = new Date(value).getTime();
+    return Number.isNaN(parsed) ? 0 : parsed;
+  }
+
   function timestampText(value) {
     if (!value) return "—";
-    let date;
-    if (typeof value === "number") date = new Date(value < 1e12 ? value * 1000 : value);
-    else if (/^\d+$/.test(String(value))) {
-      const n = Number(value); date = new Date(n < 1e12 ? n * 1000 : n);
-    } else date = new Date(value);
-    return Number.isNaN(date.getTime()) ? String(value) : date.toLocaleString();
+    const n = timestampNumber(value);
+    return n ? new Date(n).toLocaleString() : String(value);
   }
+
   function downloadText(filename, text, type="text/csv;charset=utf-8;") {
     const blob = new Blob([text], {type});
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
-    a.href = url; a.download = filename; document.body.appendChild(a); a.click(); a.remove();
-    URL.revokeObjectURL(url);
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
   }
+
   function csv(rows) {
     return rows.map(row => row.map(v => `"${String(v ?? "").replace(/"/g,'""')}"`).join(",")).join("\r\n");
   }
+
   function showLoginMessage(message, error=false) {
     const el = $("loginMessage");
     el.textContent = message;
     el.className = "notice" + (error ? " error" : "");
   }
+
   function safeFirebaseInit() {
     if (!window.firebase) {
       showLoginMessage("Firebase SDK did not load. Check your internet connection, then reload this page.", true);
       return false;
     }
-    if (firebaseConfig.apiKey === "YOUR_FIREBASE_API_KEY" || firebaseConfig.appId === "YOUR_FIREBASE_APP_ID") {
-      showLoginMessage("Paste your real Firebase web app config into firebaseConfig in this file before signing in.", true);
+    if (firebaseConfig.apiKey === "PASTE_YOUR_FIREBASE_API_KEY" ||
+        firebaseConfig.appId === "PASTE_YOUR_FIREBASE_APP_ID") {
+      showLoginMessage("Paste your Firebase web app apiKey and appId into firebaseConfig before signing in.", true);
       return false;
     }
     try {
@@ -354,7 +387,7 @@ td{font-size:13px}tbody tr:last-child td{border-bottom:0}
     showLoginMessage("Opening Google sign-in…");
     try {
       const provider = new firebase.auth.GoogleAuthProvider();
-      provider.setCustomParameters({ prompt: "select_account" });
+      provider.setCustomParameters({prompt:"select_account"});
       await state.auth.signInWithPopup(provider);
     } catch (err) {
       console.error("Google sign-in failed:", err);
@@ -381,11 +414,14 @@ td{font-size:13px}tbody tr:last-child td{border-bottom:0}
     $("adminEmail").textContent = user.email || user.displayName || "Admin";
     startListeners();
   }
+
   function showLogin() {
     state.user = null;
+    stopListeners();
     $("app").hidden = true;
     $("loginScreen").hidden = false;
   }
+
   function signOut() {
     if (state.auth) state.auth.signOut().catch(err => toast(err.message || "Sign out failed", true));
   }
@@ -393,6 +429,7 @@ td{font-size:13px}tbody tr:last-child td{border-bottom:0}
   function startListeners() {
     stopListeners();
     if (!state.db) return;
+
     const watch = (path, key) => {
       const ref = state.db.ref(path);
       const cb = snap => {
@@ -400,6 +437,7 @@ td{font-size:13px}tbody tr:last-child td{border-bottom:0}
         renderAll();
         $("connectionBadge").className = "badge green";
         $("connectionBadge").innerHTML = '<span class="dot"></span> Connected';
+        $("globalNotice").hidden = true;
       };
       const err = error => {
         console.error("Firebase read failed:", path, error);
@@ -410,12 +448,14 @@ td{font-size:13px}tbody tr:last-child td{border-bottom:0}
       ref.on("value", cb, err);
       state.listeners.push({ref, cb});
     };
+
     watch(PATHS.venues, "venues");
     watch(PATHS.bookings, "bookings");
     watch(PATHS.locations, "locations");
     watch(PATHS.slots, "slots");
     watch(PATHS.qr, "qrCodes");
   }
+
   function stopListeners() {
     state.listeners.forEach(({ref,cb}) => ref.off("value",cb));
     state.listeners = [];
@@ -425,272 +465,530 @@ td{font-size:13px}tbody tr:last-child td{border-bottom:0}
     const venue = state.venues[id];
     return venue ? val(venue,"name","venueName") || id : id || "—";
   }
+
   function getAllSlots() {
     const out = [];
-    // Supports both nested venue slots and the existing top-level parksmart/slots sensor object.
+
+    // Slots created under each venue.
     for (const [venueId, venue] of asEntries(state.venues)) {
-      const nested = venue.slots || venue.parkingSlots;
+      const nested = venue && (venue.slots || venue.parkingSlots);
       if (nested && typeof nested === "object") {
-        for (const [slotId, slot] of asEntries(nested)) out.push({venueId,venueName:getVenueName(venueId),slotId,slot:typeof slot === "object" ? slot : {status:slot}});
+        for (const [slotId, slot] of asEntries(nested)) {
+          out.push({
+            venueId,
+            venueName:getVenueName(venueId),
+            slotId,
+            slot:typeof slot === "object" ? slot : {status:slot}
+          });
+        }
       }
     }
+
+    // Existing ESP32 sensor data at parksmart/slots.
     for (const [slotId, slot] of asEntries(state.slots)) {
       if (slotId === "entry" || slotId === "exit") continue;
       const duplicate = out.some(x => x.slotId === slotId);
-      if (!duplicate) out.push({venueId:"",venueName:"Hardware sensors",slotId,slot:typeof slot === "object" ? slot : {status:slot}});
+      if (!duplicate) {
+        out.push({
+          venueId:"",
+          venueName:"Hardware sensors",
+          slotId,
+          slot:typeof slot === "object" ? slot : {status:slot}
+        });
+      }
     }
     return out;
   }
+
   function activeBookings() {
     return asEntries(state.bookings).filter(([,b]) => {
       const s = normalizeStatus(val(b,"status","bookingStatus","state"));
       return !["cancelled","completed","expired"].includes(s);
     });
   }
+
   function resolveSlotStatus(slotId, rawSlot, venueId="") {
     const sensor = state.slots[slotId];
-    const sensorStatus = normalizeStatus(typeof sensor === "object" ? val(sensor,"status","state","occupancy") : sensor);
+    const sensorStatus = normalizeStatus(
+      typeof sensor === "object" ? val(sensor,"status","state","occupancy") : sensor
+    );
+
     if (sensorStatus === "occupied") return "occupied";
+
     const booked = activeBookings().some(([,b]) => {
       const bSlot = String(val(b,"slotId","slot","parkingSlot","slotName"));
       const bVenue = String(val(b,"venueId","locationId","venue"));
       return bSlot === String(slotId) && (!venueId || !bVenue || bVenue === venueId);
     });
     if (booked) return "reserved";
-    const raw = normalizeStatus(val(rawSlot,"status","state","occupancy") || rawSlot);
+
+    const raw = normalizeStatus(
+      typeof rawSlot === "object" ? val(rawSlot,"status","state","occupancy") : rawSlot
+    );
     if (raw === "occupied") return "occupied";
     if (raw === "reserved") return "reserved";
     if (sensorStatus === "available" || raw === "available") return "available";
     return raw;
   }
+
   function renderAll() {
-    renderStats(); renderLiveSlots(); renderVenues(); renderVenueSelect(); renderQrList();
-    renderBookings(); renderRecentBookings(); renderReports();
+    renderStats();
+    renderLiveSlots();
+    renderVenues();
+    renderVenueSelect();
+    renderQrList();
+    renderBookings();
+    renderRecentBookings();
+    renderReports();
   }
+
   function renderStats() {
     const slots = getAllSlots();
     $("statVenues").textContent = asEntries(state.venues).length;
     $("statSlots").textContent = slots.length;
-    $("statOccupied").textContent = slots.filter(x => resolveSlotStatus(x.slotId,x.slot,x.venueId)==="occupied").length;
+    $("statOccupied").textContent = slots.filter(x =>
+      resolveSlotStatus(x.slotId,x.slot,x.venueId) === "occupied"
+    ).length;
     $("statBookings").textContent = activeBookings().length;
   }
+
   function renderLiveSlots() {
     const slots = getAllSlots();
-    if (!slots.length) { $("liveSlots").innerHTML = '<div class="empty">No slot data received yet. Add a venue or check the ESP32 Firebase path.</div>'; return; }
+    if (!slots.length) {
+      $("liveSlots").innerHTML = '<div class="empty">No slot data received yet. Add a venue or check the ESP32 Firebase path.</div>';
+      return;
+    }
     $("liveSlots").innerHTML = slots.slice(0,24).map(x => {
       const status = resolveSlotStatus(x.slotId,x.slot,x.venueId);
       return `<div class="slot"><strong>${escapeHtml(x.slotId)}</strong>${statusBadge(status)}<small>${escapeHtml(x.venueName)}</small></div>`;
     }).join("");
   }
+
   function renderVenues() {
     const entries = asEntries(state.venues);
-    if (!entries.length) { $("venuesList").innerHTML = '<div class="empty">No venues added yet.</div>'; return; }
+    if (!entries.length) {
+      $("venuesList").innerHTML = '<div class="empty">No venues added yet.</div>';
+      return;
+    }
+
     $("venuesList").innerHTML = entries.map(([id,v]) => {
-      const count = Number(val(v,"slotCount","totalSlots","capacity")) || asEntries(v.slots || {}).length || 0;
+      const nestedSlots = v && (v.slots || v.parkingSlots);
+      const count = Number(val(v,"slotCount","totalSlots","capacity")) || asEntries(nestedSlots).length || 0;
       return `<div style="padding:13px 0;border-bottom:1px solid var(--line)">
-        <div class="section-head" style="margin:0"><div><strong>${escapeHtml(val(v,"name","venueName") || id)}</strong><p>${escapeHtml(val(v,"type","parkingType") || "Parking")} · ${count} slots</p><p>${escapeHtml(val(v,"address","description") || "")}</p></div>
-        <div class="btn-row"><button class="btn small" data-venue-qr="${escapeHtml(id)}">QR</button><button class="btn small danger" data-delete-venue="${escapeHtml(id)}">Delete</button></div></div></div>`;
+        <div class="section-head" style="margin:0">
+          <div>
+            <strong>${escapeHtml(val(v,"name","venueName") || id)}</strong>
+            <p>${escapeHtml(val(v,"type","parkingType") || "Parking")} · ${count} slots</p>
+            <p>${escapeHtml(val(v,"address","description") || "")}</p>
+          </div>
+          <div class="btn-row">
+            <button class="btn small" data-venue-qr="${escapeHtml(id)}">QR</button>
+            <button class="btn small danger" data-delete-venue="${escapeHtml(id)}">Delete</button>
+          </div>
+        </div>
+      </div>`;
     }).join("");
   }
+
   function renderVenueSelect() {
     const select = $("qrVenueSelect");
     const previous = select.value;
-    select.innerHTML = '<option value="">Select a venue</option>' + asEntries(state.venues).map(([id,v]) => `<option value="${escapeHtml(id)}">${escapeHtml(val(v,"name","venueName") || id)}</option>`).join("");
-    if ([...select.options].some(o=>o.value===previous)) select.value = previous;
+    select.innerHTML = '<option value="">Select a venue</option>' +
+      asEntries(state.venues).map(([id,v]) =>
+        `<option value="${escapeHtml(id)}">${escapeHtml(val(v,"name","venueName") || id)}</option>`
+      ).join("");
+    if ([...select.options].some(o => o.value === previous)) select.value = previous;
   }
+
   function renderQrList() {
     const entries = asEntries(state.qrCodes);
-    if (!entries.length) { $("qrList").innerHTML = '<div class="empty">No saved QR codes yet.</div>'; return; }
+    if (!entries.length) {
+      $("qrList").innerHTML = '<div class="empty">No saved QR codes yet.</div>';
+      return;
+    }
+
     $("qrList").innerHTML = entries.map(([id,q]) => {
       const venueId = val(q,"venueId","locationId");
       const url = val(q,"url","link");
       const label = val(q,"label","name") || getVenueName(venueId);
       const imageUrl = val(q,"imageUrl","qrDataUrl");
-      return `<div class="qr-card"><strong>${escapeHtml(label)}</strong><p class="stat-note">${escapeHtml(getVenueName(venueId))}</p>
-        <div class="qr-image">${imageUrl ? `<img src="${escapeHtml(imageUrl)}" alt="QR code">` : `<div id="savedqr-${escapeHtml(id)}"></div>`}</div>
-        <div class="btn-row"><button class="btn small" data-copy-link="${escapeHtml(url)}">Copy link</button><button class="btn small" data-test-link="${escapeHtml(url)}">Test</button><button class="btn small danger" data-delete-qr="${escapeHtml(id)}">Delete</button></div></div>`;
+      return `<div class="qr-card">
+        <strong>${escapeHtml(label)}</strong>
+        <p class="stat-note">${escapeHtml(getVenueName(venueId))}</p>
+        <div class="qr-image">
+          ${imageUrl
+            ? `<img src="${escapeHtml(imageUrl)}" alt="QR code">`
+            : `<div id="savedqr-${escapeHtml(id)}"></div>`}
+        </div>
+        <div class="btn-row">
+          <button class="btn small" data-copy-link="${escapeHtml(url)}">Copy link</button>
+          <button class="btn small" data-test-link="${escapeHtml(url)}">Test</button>
+          <button class="btn small danger" data-delete-qr="${escapeHtml(id)}">Delete</button>
+        </div>
+      </div>`;
     }).join("");
+
     entries.forEach(([id,q]) => {
       if (val(q,"imageUrl","qrDataUrl")) return;
       const target = $("savedqr-" + id);
       const url = val(q,"url","link");
-      if (target && url && window.QRCode) new QRCode(target,{text:url,width:150,height:150});
+      if (target && url && window.QRCode) {
+        new QRCode(target,{text:url,width:150,height:150});
+      }
     });
   }
+
   function bookingInfo(id,b) {
     return {
-      id, name:val(b,"name","userName","customerName","displayName") || "—",
+      id,
+      name:val(b,"name","userName","customerName","displayName") || "—",
       email:val(b,"email","userEmail") || "—",
-      venue: getVenueName(val(b,"venueId","locationId","venue")),
+      venue:getVenueName(val(b,"venueId","locationId","venue")),
       slot:val(b,"slotId","slot","parkingSlot","slotName") || "—",
       status:normalizeStatus(val(b,"status","bookingStatus","state")),
       time:timestampText(val(b,"createdAt","timestamp","bookingTime","date","time")),
+      sortTime:timestampNumber(val(b,"createdAt","timestamp","bookingTime","date","time")),
       raw:b
     };
   }
+
   function filteredBookings() {
     const q = $("bookingSearch").value.trim().toLowerCase();
     const status = $("bookingStatusFilter").value;
-    return asEntries(state.bookings).map(([id,b])=>bookingInfo(id,b)).filter(b=>{
-      const matches = !q || [b.id,b.name,b.email,b.venue,b.slot,b.status].some(v=>String(v).toLowerCase().includes(q));
-      const statusMatch = status==="all" || (status==="active" ? !["cancelled","completed","expired"].includes(b.status) : b.status===status);
-      return matches && statusMatch;
-    }).sort((a,b)=>String(b.time).localeCompare(String(a.time)));
+
+    return asEntries(state.bookings)
+      .map(([id,b]) => bookingInfo(id,b))
+      .filter(b => {
+        const matches = !q || [b.id,b.name,b.email,b.venue,b.slot,b.status]
+          .some(v => String(v).toLowerCase().includes(q));
+        const statusMatch = status === "all" ||
+          (status === "active"
+            ? !["cancelled","completed","expired"].includes(b.status)
+            : b.status === status);
+        return matches && statusMatch;
+      })
+      .sort((a,b) => b.sortTime - a.sortTime);
   }
+
   function renderBookings() {
     const entries = filteredBookings();
-    if (!entries.length) { $("bookingTable").innerHTML = '<div class="empty">No matching bookings.</div>'; return; }
-    $("bookingTable").innerHTML = `<table><thead><tr><th>Booking ID</th><th>User</th><th>Venue</th><th>Slot</th><th>Status</th><th>Created</th><th>Action</th></tr></thead><tbody>${
-      entries.map(b=>`<tr><td>${escapeHtml(b.id)}</td><td>${escapeHtml(b.name)}<br><span class="stat-note">${escapeHtml(b.email)}</span></td><td>${escapeHtml(b.venue)}</td><td>${escapeHtml(b.slot)}</td><td>${statusBadge(b.status)}</td><td>${escapeHtml(b.time)}</td><td><button class="btn small danger" data-delete-booking="${escapeHtml(b.id)}">Delete</button></td></tr>`).join("")
-    }</tbody></table>`;
+    if (!entries.length) {
+      $("bookingTable").innerHTML = '<div class="empty">No matching bookings.</div>';
+      return;
+    }
+
+    $("bookingTable").innerHTML = `<table>
+      <thead><tr><th>Booking ID</th><th>User</th><th>Venue</th><th>Slot</th><th>Status</th><th>Created</th><th>Action</th></tr></thead>
+      <tbody>${entries.map(b => `<tr>
+        <td>${escapeHtml(b.id)}</td>
+        <td>${escapeHtml(b.name)}<br><span class="stat-note">${escapeHtml(b.email)}</span></td>
+        <td>${escapeHtml(b.venue)}</td>
+        <td>${escapeHtml(b.slot)}</td>
+        <td>${statusBadge(b.status)}</td>
+        <td>${escapeHtml(b.time)}</td>
+        <td><button class="btn small danger" data-delete-booking="${escapeHtml(b.id)}">Delete</button></td>
+      </tr>`).join("")}</tbody>
+    </table>`;
   }
+
   function renderRecentBookings() {
-    const entries = asEntries(state.bookings).map(([id,b])=>bookingInfo(id,b)).slice(-5).reverse();
-    if (!entries.length) { $("recentBookings").innerHTML = '<div class="empty">No bookings yet.</div>'; return; }
-    $("recentBookings").innerHTML = entries.map(b=>`<div style="padding:11px 0;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:12px"><div><strong>${escapeHtml(b.slot)}</strong><p class="stat-note">${escapeHtml(b.name)} · ${escapeHtml(b.venue)}</p></div>${statusBadge(b.status)}</div>`).join("");
+    const entries = asEntries(state.bookings)
+      .map(([id,b]) => bookingInfo(id,b))
+      .sort((a,b) => b.sortTime - a.sortTime)
+      .slice(0,5);
+
+    if (!entries.length) {
+      $("recentBookings").innerHTML = '<div class="empty">No bookings yet.</div>';
+      return;
+    }
+
+    $("recentBookings").innerHTML = entries.map(b =>
+      `<div style="padding:11px 0;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:12px">
+        <div><strong>${escapeHtml(b.slot)}</strong><p class="stat-note">${escapeHtml(b.name)} · ${escapeHtml(b.venue)}</p></div>
+        ${statusBadge(b.status)}
+      </div>`
+    ).join("");
   }
+
   function renderReports() {
-    const bookings = asEntries(state.bookings).map(([id,b])=>bookingInfo(id,b));
+    const bookings = asEntries(state.bookings).map(([id,b]) => bookingInfo(id,b));
     const slots = getAllSlots();
+
     $("reportTotal").textContent = bookings.length;
-    $("reportCancelled").textContent = bookings.filter(b=>b.status==="cancelled").length;
-    $("reportCompleted").textContent = bookings.filter(b=>b.status==="completed").length;
-    const occupied = slots.filter(x=>resolveSlotStatus(x.slotId,x.slot,x.venueId)==="occupied").length;
-    $("reportOccupancy").textContent = slots.length ? Math.round(occupied/slots.length*100)+"%" : "0%";
+    $("reportCancelled").textContent = bookings.filter(b => b.status === "cancelled").length;
+    $("reportCompleted").textContent = bookings.filter(b => b.status === "completed").length;
+
+    const occupied = slots.filter(x =>
+      resolveSlotStatus(x.slotId,x.slot,x.venueId) === "occupied"
+    ).length;
+
+    $("reportOccupancy").textContent = slots.length
+      ? Math.round(occupied / slots.length * 100) + "%"
+      : "0%";
   }
 
   async function addVenue(event) {
     event.preventDefault();
+
     const name = $("venueName").value.trim();
     const count = Number($("venueSlots").value);
-    if (!name || !Number.isInteger(count) || count<1 || count>500) return toast("Enter a venue name and a slot count from 1 to 500.",true);
+    if (!name || !Number.isInteger(count) || count < 1 || count > 500) {
+      return toast("Enter a venue name and a slot count from 1 to 500.",true);
+    }
+
     const id = "venue_" + Date.now().toString(36);
     const prefix = $("venuePrefix").value.trim() || "Slot";
     const slots = {};
     for (let i=1;i<=count;i++) slots[prefix+i] = {status:"AVAILABLE"};
-    const venue = {name,type:$("venueType").value,address:$("venueAddress").value.trim(),slotCount:count,slots,createdAt:Date.now()};
+
+    const venue = {
+      name,
+      type:$("venueType").value,
+      address:$("venueAddress").value.trim(),
+      slotCount:count,
+      slots,
+      createdAt:Date.now()
+    };
+
     try {
-      await state.db.ref(PATHS.venues+"/"+id).set(venue);
-      $("venueForm").reset(); $("venueSlots").value=4; $("venuePrefix").value="Slot";
+      await state.db.ref(PATHS.venues + "/" + id).set(venue);
+      $("venueForm").reset();
+      $("venueSlots").value = 4;
+      $("venuePrefix").value = "Slot";
       toast("Venue added.");
-    } catch(err) { toast("Could not add venue: "+(err.message||err.code),true); }
+    } catch(err) {
+      toast("Could not add venue: " + (err.message || err.code),true);
+    }
   }
+
   async function deleteVenue(id) {
     const venueName = getVenueName(id);
     if (!confirm(`Delete venue "${venueName}"? Related bookings and QR records will not be deleted automatically.`)) return;
-    try { await state.db.ref(PATHS.venues+"/"+id).remove(); toast("Venue deleted."); }
-    catch(err) { toast("Could not delete venue: "+(err.message||err.code),true); }
+
+    try {
+      await state.db.ref(PATHS.venues + "/" + id).remove();
+      toast("Venue deleted.");
+    } catch(err) {
+      toast("Could not delete venue: " + (err.message || err.code),true);
+    }
   }
+
   function consumerUrl(venueId) {
     const base = new URL("consumer.html", window.location.href);
     base.searchParams.set("locationId",venueId);
     return base.href;
   }
+
   async function generateQr() {
     const venueId = $("qrVenueSelect").value;
     if (!venueId) return toast("Choose a venue first.",true);
     if (!window.QRCode) return toast("QR library did not load. Reload the page and try again.",true);
+
     const url = consumerUrl(venueId);
     const label = $("qrLabel").value.trim() || getVenueName(venueId);
     const target = $("generatedQrArea");
-    target.innerHTML = '<div class="qr-card"><strong>'+escapeHtml(label)+'</strong><p class="stat-note">'+escapeHtml(url)+'</p><div class="qr-image"><div id="newQrCanvas"></div></div><div class="btn-row"><button id="downloadNewQr" class="btn small primary" type="button">Download PNG</button><button id="saveNewQr" class="btn small" type="button">Save QR</button></div></div>';
+
+    target.innerHTML = `<div class="qr-card">
+      <strong>${escapeHtml(label)}</strong>
+      <p class="stat-note">${escapeHtml(url)}</p>
+      <div class="qr-image"><div id="newQrCanvas"></div></div>
+      <div class="btn-row">
+        <button id="downloadNewQr" class="btn small primary" type="button">Download PNG</button>
+        <button id="saveNewQr" class="btn small" type="button">Save QR</button>
+      </div>
+    </div>`;
+
     new QRCode($("newQrCanvas"),{text:url,width:180,height:180});
     state.currentQr = {venueId,url,label};
     $("copyQrLinkBtn").disabled = false;
     $("copyQrLinkBtn").dataset.url = url;
-    $("downloadNewQr").onclick = () => downloadQrNode($("newQrCanvas"),"parksmart-"+venueId+".png");
+    $("downloadNewQr").onclick = () => downloadQrNode($("newQrCanvas"),"parksmart-" + venueId + ".png");
     $("saveNewQr").onclick = saveCurrentQr;
   }
+
   function downloadQrNode(node,filename) {
     const canvas = node && node.querySelector("canvas");
     const img = node && node.querySelector("img");
     const data = canvas ? canvas.toDataURL("image/png") : img ? img.src : "";
     if (!data) return toast("QR image is not ready yet.",true);
-    const a=document.createElement("a");a.href=data;a.download=filename;a.click();
+
+    const a = document.createElement("a");
+    a.href = data;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
   }
+
   async function saveCurrentQr() {
     if (!state.currentQr) return;
-    const {venueId,url,label}=state.currentQr;
-    const id="qr_"+Date.now().toString(36);
+
+    const {venueId,url,label} = state.currentQr;
+    const id = "qr_" + Date.now().toString(36);
+
     try {
-      const node=$("newQrCanvas"), canvas=node.querySelector("canvas"), img=node.querySelector("img");
-      const imageUrl=canvas?canvas.toDataURL("image/png"):img?img.src:"";
-      await state.db.ref(PATHS.qr+"/"+id).set({venueId,url,label,imageUrl,createdAt:Date.now()});
+      const node = $("newQrCanvas");
+      const canvas = node && node.querySelector("canvas");
+      const img = node && node.querySelector("img");
+      const imageUrl = canvas ? canvas.toDataURL("image/png") : img ? img.src : "";
+
+      await state.db.ref(PATHS.qr + "/" + id).set({
+        venueId,url,label,imageUrl,createdAt:Date.now()
+      });
       toast("QR code saved.");
-    } catch(err) { toast("Could not save QR: "+(err.message||err.code),true); }
+    } catch(err) {
+      toast("Could not save QR: " + (err.message || err.code),true);
+    }
   }
+
   async function deleteQr(id) {
     if (!confirm("Delete this saved QR code?")) return;
-    try { await state.db.ref(PATHS.qr+"/"+id).remove(); toast("QR code deleted."); }
-    catch(err) { toast("Could not delete QR: "+(err.message||err.code),true); }
+    try {
+      await state.db.ref(PATHS.qr + "/" + id).remove();
+      toast("QR code deleted.");
+    } catch(err) {
+      toast("Could not delete QR: " + (err.message || err.code),true);
+    }
   }
+
   async function deleteBooking(id) {
     if (!confirm("Delete this booking record?")) return;
-    try { await state.db.ref(PATHS.bookings+"/"+id).remove(); toast("Booking deleted."); }
-    catch(err) { toast("Could not delete booking: "+(err.message||err.code),true); }
+    try {
+      await state.db.ref(PATHS.bookings + "/" + id).remove();
+      toast("Booking deleted.");
+    } catch(err) {
+      toast("Could not delete booking: " + (err.message || err.code),true);
+    }
   }
+
   async function clearBookings() {
     if (!confirm("Clear ALL booking history? This cannot be undone.")) return;
-    try { await state.db.ref(PATHS.bookings).remove(); toast("Booking history cleared."); }
-    catch(err) { toast("Could not clear bookings: "+(err.message||err.code),true); }
+    try {
+      await state.db.ref(PATHS.bookings).remove();
+      toast("Booking history cleared.");
+    } catch(err) {
+      toast("Could not clear bookings: " + (err.message || err.code),true);
+    }
   }
+
   function exportBookings() {
-    const rows=[["Booking ID","Name","Email","Venue","Slot","Status","Created"]];
-    filteredBookings().forEach(b=>rows.push([b.id,b.name,b.email,b.venue,b.slot,b.status,b.time]));
+    const rows = [["Booking ID","Name","Email","Venue","Slot","Status","Created"]];
+    filteredBookings().forEach(b => rows.push([b.id,b.name,b.email,b.venue,b.slot,b.status,b.time]));
     downloadText("parksmart-bookings.csv",csv(rows));
   }
+
   function exportVenues() {
-    const rows=[["Venue ID","Name","Type","Address","Slots"]];
-    asEntries(state.venues).forEach(([id,v])=>rows.push([id,val(v,"name","venueName"),val(v,"type","parkingType"),val(v,"address","description"),val(v,"slotCount","totalSlots")]));
+    const rows = [["Venue ID","Name","Type","Address","Slots"]];
+    asEntries(state.venues).forEach(([id,v]) =>
+      rows.push([
+        id,
+        val(v,"name","venueName"),
+        val(v,"type","parkingType"),
+        val(v,"address","description"),
+        val(v,"slotCount","totalSlots")
+      ])
+    );
     downloadText("parksmart-venues.csv",csv(rows));
   }
+
   function exportSlots() {
-    const rows=[["Venue","Venue ID","Slot ID","Status"]];
-    getAllSlots().forEach(x=>rows.push([x.venueName,x.venueId,x.slotId,resolveSlotStatus(x.slotId,x.slot,x.venueId)]));
+    const rows = [["Venue","Venue ID","Slot ID","Status"]];
+    getAllSlots().forEach(x =>
+      rows.push([x.venueName,x.venueId,x.slotId,resolveSlotStatus(x.slotId,x.slot,x.venueId)])
+    );
     downloadText("parksmart-slot-status.csv",csv(rows));
   }
+
   function exportBookingsReport() {
-    const rows=[["Booking ID","Name","Email","Venue","Slot","Status","Created"]];
-    asEntries(state.bookings).map(([id,b])=>bookingInfo(id,b)).forEach(b=>rows.push([b.id,b.name,b.email,b.venue,b.slot,b.status,b.time]));
+    const rows = [["Booking ID","Name","Email","Venue","Slot","Status","Created"]];
+    asEntries(state.bookings).map(([id,b]) => bookingInfo(id,b))
+      .forEach(b => rows.push([b.id,b.name,b.email,b.venue,b.slot,b.status,b.time]));
     downloadText("parksmart-bookings-report.csv",csv(rows));
   }
+
   function copyText(text) {
     if (!text) return toast("Nothing to copy.",true);
-    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(()=>toast("Copied to clipboard.")).catch(()=>fallbackCopy(text));
-    else fallbackCopy(text);
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text)
+        .then(() => toast("Copied to clipboard."))
+        .catch(() => fallbackCopy(text));
+    } else {
+      fallbackCopy(text);
+    }
   }
+
   function fallbackCopy(text) {
-    const input=document.createElement("textarea");input.value=text;document.body.appendChild(input);input.select();
-    try { document.execCommand("copy"); toast("Copied to clipboard."); } catch(e) { toast("Copy failed. Copy the link manually.",true); }
+    const input = document.createElement("textarea");
+    input.value = text;
+    document.body.appendChild(input);
+    input.select();
+    try {
+      if (document.execCommand("copy")) toast("Copied to clipboard.");
+      else toast("Copy failed. Copy the link manually.",true);
+    } catch(e) {
+      toast("Copy failed. Copy the link manually.",true);
+    }
     input.remove();
   }
 
   function setPage(page) {
-    document.querySelectorAll(".page").forEach(el=>el.classList.toggle("active",el.id==="page-"+page));
-    document.querySelectorAll(".nav button").forEach(el=>el.classList.toggle("active",el.dataset.page===page));
-    const names={overview:"Overview",venues:"Venues",qr:"QR Management",bookings:"Booking History",reports:"Reports"};
-    $("pageTitle").textContent=names[page]||"Overview";
+    document.querySelectorAll(".page").forEach(el =>
+      el.classList.toggle("active",el.id === "page-" + page)
+    );
+    document.querySelectorAll(".nav button").forEach(el =>
+      el.classList.toggle("active",el.dataset.page === page)
+    );
+
+    const names = {
+      overview:"Overview",
+      venues:"Venues",
+      qr:"QR Management",
+      bookings:"Booking History",
+      reports:"Reports"
+    };
+    $("pageTitle").textContent = names[page] || "Overview";
     $("sidebar").classList.remove("open");
   }
 
   document.addEventListener("click", async event => {
-    const target=event.target.closest("button");
+    const target = event.target.closest("button");
     if (!target) return;
+
     if (target.dataset.page) setPage(target.dataset.page);
     if (target.dataset.goto) setPage(target.dataset.goto);
     if (target.dataset.deleteVenue) await deleteVenue(target.dataset.deleteVenue);
-    if (target.dataset.venueQr) { setPage("qr"); $("qrVenueSelect").value=target.dataset.venueQr; $("qrLabel").value=getVenueName(target.dataset.venueQr); await generateQr(); }
+
+    if (target.dataset.venueQr) {
+      setPage("qr");
+      $("qrVenueSelect").value = target.dataset.venueQr;
+      $("qrLabel").value = getVenueName(target.dataset.venueQr);
+      await generateQr();
+    }
+
     if (target.dataset.deleteQr) await deleteQr(target.dataset.deleteQr);
     if (target.dataset.deleteBooking) await deleteBooking(target.dataset.deleteBooking);
     if (target.dataset.copyLink) copyText(target.dataset.copyLink);
-    if (target.dataset.testLink) window.open(target.dataset.testLink,"_blank","noopener");
+
+    if (target.dataset.testLink) {
+      const url = target.dataset.testLink;
+      try {
+        const parsed = new URL(url);
+        if (parsed.protocol === "https:" || parsed.protocol === "http:") {
+          window.open(parsed.href,"_blank","noopener,noreferrer");
+        } else {
+          toast("This QR link is not a valid web URL.",true);
+        }
+      } catch {
+        toast("This QR link is not a valid web URL.",true);
+      }
+    }
   });
 
   $("googleLoginBtn").addEventListener("click",loginWithGoogle);
   $("logoutBtn").addEventListener("click",signOut);
   $("venueForm").addEventListener("submit",addVenue);
   $("generateQrBtn").addEventListener("click",generateQr);
-  $("copyQrLinkBtn").addEventListener("click",()=>copyText($("copyQrLinkBtn").dataset.url));
+  $("copyQrLinkBtn").addEventListener("click",() => copyText($("copyQrLinkBtn").dataset.url));
   $("bookingSearch").addEventListener("input",renderBookings);
   $("bookingStatusFilter").addEventListener("change",renderBookings);
   $("exportBookingsBtn").addEventListener("click",exportBookings);
@@ -698,18 +996,26 @@ td{font-size:13px}tbody tr:last-child td{border-bottom:0}
   $("exportVenuesBtn").addEventListener("click",exportVenues);
   $("exportSlotsBtn").addEventListener("click",exportSlots);
   $("exportBookingsReportBtn").addEventListener("click",exportBookingsReport);
-  $("refreshBtn").addEventListener("click",()=>{renderAll();toast("Dashboard refreshed.");});
-  $("mobileMenuBtn").addEventListener("click",()=>$("sidebar").classList.toggle("open"));
+  $("refreshBtn").addEventListener("click",() => {
+    renderAll();
+    toast("Dashboard refreshed.");
+  });
+  $("mobileMenuBtn").addEventListener("click",() => $("sidebar").classList.toggle("open"));
 
   if (safeFirebaseInit()) {
     state.auth.onAuthStateChanged(user => {
-      if (!user) { showLogin(); return; }
-      const email=(user.email||"").toLowerCase();
-      if (!ADMIN_EMAILS.map(x=>x.toLowerCase()).includes(email)) {
+      if (!user) {
+        showLogin();
+        return;
+      }
+
+      const email = (user.email || "").toLowerCase();
+      if (!ADMIN_EMAILS.map(x => x.toLowerCase()).includes(email)) {
         showLoginMessage("This Google account is not authorized for admin access. Sign out and use the approved admin account.",true);
         state.auth.signOut().catch(console.error);
         return;
       }
+
       showApp(user);
     });
   }
