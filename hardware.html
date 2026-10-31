@@ -1,304 +1,219 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#0b1425">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>ParkSmart | Hardware Dashboard</title>
 
 <style>
-:root{
-  --bg:#0b1425;--panel:#18263d;--panel2:#0d192c;--line:#263852;
-  --text:#f4f7ff;--muted:#9eafc7;--blue:#168ee0;
-  --green:#36d887;--red:#ff617d;--amber:#ffc45d
+:root {
+  --bg: #061426;
+  --panel: rgba(5, 23, 44, .88);
+  --line: rgba(99, 190, 255, .35);
+  --blue: #13b9ff;
+  --green: #00e5a0;
+  --red: #ff5267;
+  --yellow: #ffc247;
 }
-*{box-sizing:border-box}
-body{
-  margin:0;background:radial-gradient(ellipse at top right,#142b45 0%,var(--bg) 55%);
-  color:var(--text);font:14px/1.5 "Segoe UI",Arial,sans-serif
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  color: #f4f9ff;
+  font-family: Arial, sans-serif;
+  background:
+    linear-gradient(180deg, rgba(3,13,27,.82), rgba(3,13,27,.94)),
+    repeating-linear-gradient(90deg, transparent 0 150px, rgba(255,255,255,.035) 151px 153px),
+    repeating-linear-gradient(0deg, #142b42 0 2px, #07182b 2px 100px);
+  min-height: 100vh;
 }
-a{color:#91dfff;text-decoration:none}
-header{
-  max-width:1160px;margin:auto;padding:25px 20px 18px;
-  display:flex;align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap
+body:before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse at 50% 0%, rgba(15,145,255,.2), transparent 50%),
+    linear-gradient(115deg, transparent 48%, rgba(255,255,255,.025) 49%, transparent 50%);
 }
-.brand{display:flex;align-items:center;gap:12px}
-.logo{
-  width:48px;height:48px;border-radius:14px;background:#167ce0;
-  display:grid;place-items:center;font-size:26px;font-weight:900;
-  box-shadow:0 5px 20px #087cff38
+main { max-width: 1450px; margin: auto; padding: 24px; position: relative; }
+header { display:flex; align-items:center; justify-content:space-between; gap:20px; flex-wrap:wrap; margin-bottom:22px; }
+.brand { display:flex; align-items:center; gap:14px; }
+.logo { font-size:42px; color:var(--blue); }
+h1 { margin:0; font-size:clamp(26px,4vw,40px); }
+h1 span { color:var(--blue); }
+.subtitle { color:#a9c5df; margin-top:5px; }
+.connection { border:1px solid var(--line); border-radius:30px; padding:12px 18px; color:var(--green); background:#062a35; }
+.summary { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:20px; }
+.metric, .panel { background:var(--panel); border:1px solid var(--line); border-radius:20px; box-shadow:0 12px 35px #0005; backdrop-filter:blur(8px); }
+.metric { padding:18px; display:flex; align-items:center; gap:14px; }
+.metric-icon { font-size:34px; }
+.metric small { color:#a9c5df; display:block; }
+.metric strong { display:block; font-size:30px; margin-top:4px; }
+.content { display:grid; grid-template-columns:minmax(0, 2fr) minmax(280px, .9fr); gap:18px; }
+.panel { padding:20px; }
+.panel h2 { margin:0 0 5px; font-size:23px; }
+.hint { color:#9fbad4; margin:0 0 18px; }
+.slots { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; }
+.slot { border:1px solid var(--line); border-radius:16px; padding:16px; background:rgba(3,15,31,.78); min-width:0; }
+.slot-top { display:flex; justify-content:space-between; gap:8px; align-items:center; }
+.slot h3 { margin:0; font-size:20px; }
+.status { border-radius:22px; padding:7px 11px; font-weight:bold; font-size:13px; white-space:nowrap; }
+.available { color:var(--green); background:#003c32; border:1px solid #007d66; }
+.occupied { color:var(--red); background:#451a2b; border:1px solid #a62c48; }
+.reserved { color:var(--yellow); background:#443217; border:1px solid #956b1b; }
+.vehicle { text-align:center; font-size:78px; padding:13px 0 5px; filter:drop-shadow(0 8px 8px #0009); }
+.slot-info { color:#b8d0e8; font-size:14px; line-height:1.8; }
+.slot-info b { color:#fff; }
+.gates { display:grid; gap:14px; }
+.gate { border:1px solid var(--line); border-radius:16px; padding:16px; background:rgba(3,15,31,.78); }
+.gate-top { display:flex; justify-content:space-between; align-items:center; gap:10px; }
+.gate-icon { font-size:30px; color:var(--blue); }
+.gate p { color:#a9c5df; margin:8px 0 0; }
+.gate-state { color:var(--green); font-weight:bold; }
+footer { display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; margin-top:18px; padding:15px 18px; border:1px solid var(--line); border-radius:16px; background:var(--panel); color:#aac7e2; }
+button { background:linear-gradient(135deg,#00a8ff,#1268ff); color:white; border:0; border-radius:24px; padding:12px 20px; font-weight:bold; cursor:pointer; }
+@media(max-width:900px) {
+  .summary { grid-template-columns:repeat(2,1fr); }
+  .content { grid-template-columns:1fr; }
 }
-.brand h1{font-size:27px;margin:0;line-height:1.2}
-.brand p{margin:5px 0 0;color:var(--muted);font-size:13px}
-.connection{border:1px solid #24523f;color:var(--green);background:#102b29;
-  padding:8px 14px;border-radius:30px;font-size:12px}
-main{max-width:1160px;margin:auto;padding:0 20px 36px}
-.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:8px 0 20px}
-.stat,.panel,.slot,.gate{
-  border:1px solid var(--line);border-radius:18px;
-  background:linear-gradient(145deg,#1a2941,#142136)
+@media(max-width:560px) {
+  main { padding:14px; }
+  .slots { grid-template-columns:1fr; }
+  .metric { padding:13px; }
+  .metric strong { font-size:24px; }
+  .panel { padding:14px; }
 }
-.stat{padding:17px 16px}
-.stat small{display:block;color:var(--muted);font-size:12px;margin-bottom:7px}
-.stat strong{font-size:28px;line-height:1.2}
-.content{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(300px,.9fr);gap:16px}
-.panel{padding:20px;min-width:0}
-.panel h2{margin:0;font-size:20px}
-.sub{color:var(--muted);font-size:12px;margin:7px 0 17px}
-.slots{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
-.slot{
-  background:#0d192c;padding:15px;min-width:0;
-  border-radius:15px;transition:border-color .2s
-}
-.slot:hover{border-color:#3d6388}
-.slot-head{display:flex;align-items:center;justify-content:space-between;gap:8px}
-.slot h3{margin:0;font-size:16px}
-.badge{font-size:11px;font-weight:800;padding:5px 10px;border-radius:30px;white-space:nowrap}
-.available{background:#123c2e;color:var(--green)}
-.occupied{background:#421f30;color:var(--red)}
-.unknown{background:#42351e;color:var(--amber)}
-.car{width:48px;height:42px;display:block;margin:20px 0 12px}
-.slot-info{color:var(--muted);font-size:12px;line-height:1.7}
-.slot-info b{font-weight:500;color:#dbe7f7}
-.gates{display:grid;gap:12px}
-.gate{padding:16px;background:#0d192c;border-radius:15px}
-.gate-head{display:flex;justify-content:space-between;align-items:center;gap:10px}
-.gate h3{margin:0;font-size:16px}
-.gate-icon{width:38px;height:38px;display:grid;place-items:center;border-radius:11px;background:#203650;font-size:20px}
-.gate-state{margin:12px 0 3px;font-size:19px;font-weight:750}
-.gate-note{font-size:12px;color:var(--muted)}
-.message{margin-top:15px;padding:13px;border-radius:12px;background:#0d192c;border:1px solid var(--line);color:var(--muted);font-size:12px}
-.bottom{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-top:16px}
-button{border:1px solid #35516e;border-radius:10px;background:#253a54;color:white;padding:10px 15px;font:inherit;font-weight:650;cursor:pointer}
-button:hover{background:#304d70}
-@media(max-width:850px){.content{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media(max-width:480px){header{padding:18px 14px}main{padding:0 12px 25px}.panel{padding:14px}.slots{gap:9px}.slot{padding:11px}.slot h3{font-size:14px}.badge{font-size:10px;padding:4px 7px}.stat{padding:14px}.stat strong{font-size:24px}}
 </style>
 </head>
+
 <body>
-
-<header>
-  <div class="brand">
-    <div class="logo">P</div>
-    <div>
-      <h1>ParkSmart</h1>
-      <p>Smart Parking · Live Hardware Dashboard</p>
-    </div>
-  </div>
-  <span class="connection" id="connection">● Connecting to Firebase…</span>
-</header>
-
 <main>
-  <section class="stats">
-    <div class="stat"><small>Total slots</small><strong>4</strong></div>
-    <div class="stat"><small>Available</small><strong id="availableCount">—</strong></div>
-    <div class="stat"><small>Occupied</small><strong id="occupiedCount">—</strong></div>
-    <div class="stat"><small>Active bookings</small><strong id="bookingCount">—</strong></div>
+  <header>
+    <div class="brand">
+      <div class="logo">🅿️</div>
+      <div>
+        <h1>Park<span>Smart</span></h1>
+        <div class="subtitle">Smart Parking · Live Hardware Dashboard</div>
+      </div>
+    </div>
+    <div class="connection" id="connection">● Connecting to Firebase…</div>
+  </header>
+
+  <section class="summary">
+    <div class="metric"><div class="metric-icon">🅿️</div><div><small>Total Slots</small><strong>4</strong></div></div>
+    <div class="metric"><div class="metric-icon">🚘</div><div><small>Available</small><strong id="availableCount">—</strong></div></div>
+    <div class="metric"><div class="metric-icon">🚗</div><div><small>Occupied</small><strong id="occupiedCount">—</strong></div></div>
+    <div class="metric"><div class="metric-icon">🕒</div><div><small>Reserved</small><strong id="reservedCount">—</strong></div></div>
   </section>
 
-  <div class="content">
-    <section class="panel">
-      <h2>🅿 Live parking slots</h2>
-      <p class="sub">Physical sensor state and booking state are tracked separately.</p>
-      <div class="slots" id="slots">Waiting for Firebase data…</div>
-      <div class="bottom">
-        <span class="sub" id="lastUpdated">Waiting for first update…</span>
-        <button id="refresh">Refresh status</button>
-      </div>
-    </section>
+  <section class="content">
+    <div class="panel">
+      <h2>🚘 Live Parking Slots</h2>
+      <p class="hint">Real-time status from parking sensors</p>
+      <div class="slots" id="slots"></div>
+    </div>
 
-    <section class="panel">
-      <h2>🚦 Gate status</h2>
-      <p class="sub">Entry and exit status reported by the ESP32.</p>
+    <div class="panel">
+      <h2>🚧 Gate Status</h2>
+      <p class="hint">Entry and exit monitoring</p>
       <div class="gates">
-        <article class="gate">
-          <div class="gate-head">
-            <div class="gate-icon">↘</div>
-            <span class="badge unknown" id="entryBadge">UNKNOWN</span>
-          </div>
-          <h3>Entry Gate</h3>
-          <div class="gate-state" id="entryState">Waiting…</div>
-          <div class="gate-note" id="entryNote">Waiting for ESP32 update</div>
-        </article>
-        <article class="gate">
-          <div class="gate-head">
-            <div class="gate-icon">↗</div>
-            <span class="badge unknown" id="exitBadge">UNKNOWN</span>
-          </div>
-          <h3>Exit Gate</h3>
-          <div class="gate-state" id="exitState">Waiting…</div>
-          <div class="gate-note" id="exitNote">Waiting for ESP32 update</div>
-        </article>
+        <div class="gate">
+          <div class="gate-top"><span class="gate-icon">↘</span><span class="gate-state" id="entryState">Waiting…</span></div>
+          <h3>Entry Gate</h3><p id="entryDetail">No vehicle detected</p>
+        </div>
+        <div class="gate">
+          <div class="gate-top"><span class="gate-icon">↗</span><span class="gate-state" id="exitState">Waiting…</span></div>
+          <h3>Exit Gate</h3><p id="exitDetail">No vehicle detected</p>
+        </div>
       </div>
-      <div class="message" id="systemMessage">Connecting to Firebase…</div>
-    </section>
-  </div>
+    </div>
+  </section>
+
+  <footer>
+    <span id="updated">Last updated: Waiting for data…</span>
+    <button onclick="location.reload()">↻ Refresh Status</button>
+  </footer>
 </main>
 
 <script type="module">
-import {initializeApp}
-  from "https://www.gstatic.com/firebasejs/13.0.0/firebase-app.js";
-import {getDatabase,ref,onValue,get}
-  from "https://www.gstatic.com/firebasejs/13.0.0/firebase-database.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
-const firebaseConfig={
-  apiKey:"AIzaSyAsffyVnKES_-tZz3pnuojPLPFBk3TJe5E",
-  authDomain:"smartpark-9ecbb.firebaseapp.com",
-  databaseURL:"https://smartpark-9ecbb-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId:"smartpark-9ecbb",
-  storageBucket:"smartpark-9ecbb.firebasestorage.app",
-  messagingSenderId:"423958538578",
-  appId:"1:423958538578:web:b7c5395f8348e3a00f728b"
+const firebaseConfig = {
+  apiKey: "AIzaSyAsffyVnKES_-tZz3pnuojPLPFBk3TJe5E",
+  authDomain: "smartpark-9ecbb.firebaseapp.com",
+  databaseURL: "https://smartpark-9ecbb-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "smartpark-9ecbb",
+  storageBucket: "smartpark-9ecbb.firebasestorage.app",
+  messagingSenderId: "423958538578",
+  appId: "1:423958538578:web:b7c5395f8348e3a00f728b"
 };
 
-const app=initializeApp(firebaseConfig);
-const db=getDatabase(app);
-const $=id=>document.getElementById(id);
-const slotIds=["slot1","slot2","slot3","slot4"];
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getDatabase(app);
 
-let sensors={},bookings={},gates={};
-let sensorLoaded=false,bookingLoaded=false,gateLoaded=false;
+const normalize = value => String(value ?? "").toUpperCase();
+const reserved = value => normalize(value).includes("RESERVED") || normalize(value).includes("BOOKED");
+const occupied = value => normalize(value).includes("OCCUPIED");
+const statusOf = value => reserved(value) ? "Reserved" : occupied(value) ? "Occupied" : "Available";
 
-function normalizeStatus(value){
-  if(value&&typeof value==="object"){
-    value=value.status??value.state??value.occupancy??value.value;
-  }
-  const s=String(value??"").trim().toUpperCase();
-  if(["AVAILABLE","FREE","EMPTY","0"].includes(s))return "AVAILABLE";
-  if(["OCCUPIED","FULL","1"].includes(s))return "OCCUPIED";
-  return "UNKNOWN";
-}
-function activeBooking(b){
-  return !!b&&["ACTIVE","BOOKED"].includes(String(b.status??"").toUpperCase());
-}
-function esc(value){
-  return String(value??"").replace(/[&<>"']/g,c=>({
-    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
-  }[c]));
-}
-function carSvg(){
-  return `<svg class="car" viewBox="0 0 64 52" aria-label="Car illustration" role="img">
-    <defs><linearGradient id="carPaint" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#65e6ff"/><stop offset="1" stop-color="#2378ff"/>
-    </linearGradient></defs>
-    <path d="M13 20 19 8Q21 4 26 4h13q5 0 7 5l6 11q6 2 6 9v12q0 4-4 4h-4a7 7 0 0 1-14 0H28a7 7 0 0 1-14 0h-4q-4 0-4-4V29q0-7 7-9Z" fill="url(#carPaint)" stroke="#a4f1ff" stroke-width="1.5"/>
-    <path d="m22 10-5 10h30L42 10q-1-2-4-2H26q-3 0-4 2Z" fill="#d5f7ff"/>
-    <path d="M8 29h48v8H8Z" fill="#1b4c9b"/>
-    <rect x="7" y="27" width="7" height="5" rx="2" fill="#ff7d9b"/>
-    <rect x="50" y="27" width="7" height="5" rx="2" fill="#ff7d9b"/>
-    <circle cx="21" cy="41" r="5" fill="#08101e" stroke="#a9c4df" stroke-width="2"/>
-    <circle cx="43" cy="41" r="5" fill="#08101e" stroke="#a9c4df" stroke-width="2"/>
-  </svg>`;
-}
-function renderSlots(){
-  let available=0,occupied=0,booked=0;
+function renderSlots(slots = {}, bookings = {}) {
+  let available = 0, occupiedTotal = 0, reservedTotal = 0;
+  document.getElementById("slots").innerHTML = [1,2,3,4].map(n => {
+    const id = `slot${n}`;
+    const sensor = slots[id] ?? "UNKNOWN";
+    const booking = bookings[id];
+    const isReserved = booking && !normalize(booking.status).includes("CANCEL");
+    const status = isReserved ? "Reserved" : statusOf(sensor);
+    if (status === "Available") available++;
+    if (status === "Occupied") occupiedTotal++;
+    if (status === "Reserved") reservedTotal++;
 
-  $("slots").innerHTML=slotIds.map(id=>{
-    const sensor=normalizeStatus(sensors[id]);
-    const booking=activeBooking(bookings[id])?bookings[id]:null;
-
-    if(sensor==="AVAILABLE"&&!booking)available++;
-    if(sensor==="OCCUPIED")occupied++;
-    if(booking)booked++;
-
-    const label=sensor==="AVAILABLE"?"AVAILABLE":
-      sensor==="OCCUPIED"?"OCCUPIED":"UNKNOWN";
-    const cls=sensor==="AVAILABLE"?"available":
-      sensor==="OCCUPIED"?"occupied":"unknown";
-    const bookingLabel=booking?"Reserved":"None";
-
+    const cls = status.toLowerCase();
+    const car = status === "Available" ? "🚙" : status === "Reserved" ? "🚘" : "🚗";
     return `<article class="slot">
-      <div class="slot-head">
-        <h3>${esc(id.replace("slot","Slot "))}</h3>
-        <span class="badge ${cls}">${label}</span>
-      </div>
-      ${carSvg()}
-      <div class="slot-info">
-        <div>Sensor: <b>${label}</b></div>
-        <div>Booking: <b>${bookingLabel}</b></div>
-      </div>
+      <div class="slot-top"><h3>Slot ${n}</h3><span class="status ${cls}">${status}</span></div>
+      <div class="vehicle" aria-label="vehicle">${car}</div>
+      <div class="slot-info">Sensor: <b>${normalize(sensor)}</b><br>Booking: <b>${isReserved ? "Reserved" : "None"}</b></div>
     </article>`;
   }).join("");
 
-  $("availableCount").textContent=available;
-  $("occupiedCount").textContent=occupied;
-  $("bookingCount").textContent=booked;
-}
-function gateText(value){
-  if(value&&typeof value==="object"){
-    value=value.status??value.state??value.message??value.value;
-  }
-  const s=String(value??"").trim().toUpperCase();
-  if(!s)return {label:"UNKNOWN",state:"Waiting for update",note:"No gate data received",cls:"unknown"};
-  if(s.includes("OPEN")||s.includes("ENTER")||s.includes("DETECT")){
-    return {label:"ACTIVE",state:s.replaceAll("_"," "),note:"Vehicle detected / gate active",cls:"available"};
-  }
-  if(s.includes("CLOSED")||s.includes("CLEAR")||s.includes("IDLE")){
-    return {label:"CLEAR",state:s.replaceAll("_"," "),note:"No vehicle detected",cls:"unknown"};
-  }
-  return {label:"STATUS",state:s.replaceAll("_"," "),note:"Latest ESP32 gate value",cls:"unknown"};
-}
-function renderGate(which){
-  const raw=gates[which];
-  const g=gateText(raw);
-  $(which+"Badge").textContent=g.label;
-  $(which+"Badge").className="badge "+g.cls;
-  $(which+"State").textContent=g.state;
-  $(which+"Note").textContent=g.note;
-}
-function updateConnection(){
-  if(sensorLoaded&&bookingLoaded&&gateLoaded){
-    $("connection").textContent="● Firebase connected";
-    $("systemMessage").textContent="Live data received from Firebase.";
-  }
-}
-function stamp(){
-  $("lastUpdated").textContent="Last updated: "+new Date().toLocaleTimeString();
-}
-function showError(e){
-  $("connection").textContent="● Firebase read error";
-  $("connection").style.color="var(--red)";
-  $("systemMessage").textContent="Firebase error: "+e.message;
+  document.getElementById("availableCount").textContent = available;
+  document.getElementById("occupiedCount").textContent = occupiedTotal;
+  document.getElementById("reservedCount").textContent = reservedTotal;
+  document.getElementById("updated").textContent = "Last updated: " + new Date().toLocaleString();
 }
 
-function startListeners(){
-  onValue(ref(db,"parksmart/slots"),snap=>{
-    sensors=snap.val()||{};
-    sensorLoaded=true;
-    renderSlots();stamp();updateConnection();
-  },showError);
-
-  onValue(ref(db,"parksmart/bookings"),snap=>{
-    bookings=snap.val()||{};
-    bookingLoaded=true;
-    renderSlots();stamp();updateConnection();
-  },showError);
-
-  onValue(ref(db,"parksmart/gate"),snap=>{
-    gates=snap.val()||{};
-    gateLoaded=true;
-    renderGate("entry");renderGate("exit");
-    stamp();updateConnection();
-  },showError);
+function setGate(name, value) {
+  const v = normalize(value);
+  const active = v.includes("DETECT") || v.includes("OPEN") || v.includes("ENTER") || v === "1";
+  document.getElementById(name + "State").textContent = active ? "● ACTIVE" : "● CLOSED";
+  document.getElementById(name + "Detail").textContent = active ? "Vehicle detected" : "No vehicle detected";
 }
-$("refresh").onclick=async()=>{
-  $("systemMessage").textContent="Refreshing Firebase data…";
-  try{
-    const [s,b,g]=await Promise.all([
-      get(ref(db,"parksmart/slots")),
-      get(ref(db,"parksmart/bookings")),
-      get(ref(db,"parksmart/gate"))
-    ]);
-    sensors=s.val()||{};bookings=b.val()||{};gates=g.val()||{};
-    renderSlots();renderGate("entry");renderGate("exit");stamp();
-    $("systemMessage").textContent="Status refreshed.";
-  }catch(e){showError(e)}
-};
 
-renderSlots();
-renderGate("entry");
-renderGate("exit");
-startListeners();
+signInAnonymously(auth).then(() => {
+  document.getElementById("connection").textContent = "● Firebase Connected";
+  let slots = {}, bookings = {};
+
+  onValue(ref(db, "parksmart/slots"), snap => {
+    slots = snap.val() || {};
+    renderSlots(slots, bookings);
+  }, error => {
+    document.getElementById("connection").textContent = "Firebase read error: " + error.message;
+  });
+
+  onValue(ref(db, "parksmart/bookings"), snap => {
+    bookings = snap.val() || {};
+    renderSlots(slots, bookings);
+  });
+
+  onValue(ref(db, "parksmart/gate/entry"), snap => setGate("entry", snap.val()));
+  onValue(ref(db, "parksmart/gate/exit"), snap => setGate("exit", snap.val()));
+}).catch(error => {
+  document.getElementById("connection").textContent = "Firebase login error: " + error.message;
+});
 </script>
 </body>
 </html>
