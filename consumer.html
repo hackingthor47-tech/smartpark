@@ -35,6 +35,7 @@ button.secondary{background:#203b58}button.danger{background:#a92b49}button:disa
  <div><h1>🚗 Park<span>Smart</span></h1><p>Your smarter parking companion</p></div>
  <nav><a href="./index.html">Home</a><a href="./admin.html">Admin</a><a href="./hardware.html">Hardware</a></nav>
 </header>
+
 <main>
  <section class="hero">
   <div class="eyebrow">Park smarter · Move easier</div>
@@ -42,19 +43,44 @@ button.secondary{background:#203b58}button.danger{background:#a92b49}button:disa
   <p>Check parking availability, reserve an available slot, and save your parking location by scanning a ParkSmart QR code.</p>
   <span class="pill" id="connection">Connecting to Firebase…</span>
  </section>
- <section class="panel"><h2>📍 Your QR Parking Location</h2><div id="qrLocation" class="notice">Checking this link for a parking location…</div><button id="saveQrLocation" disabled>＋ Save My Parking</button></section>
+
+ <section class="panel">
+  <h2>📍 Your QR Parking Location</h2>
+  <div id="qrLocation" class="notice">Checking this link for a parking location…</div>
+  <button id="saveQrLocation" disabled>＋ Save My Parking</button>
+ </section>
+
  <section class="stats">
   <div class="stat"><small>Available slots</small><strong id="availableCount">—</strong></div>
   <div class="stat"><small>Occupied slots</small><strong id="occupiedCount">—</strong></div>
   <div class="stat"><small>Active bookings</small><strong id="bookingCount">—</strong></div>
  </section>
- <section class="panel"><h2>🅿️ Live Parking Slots</h2><p class="muted">Slot availability and bookings update from Firebase.</p><div id="slots">Waiting for parking data…</div></section>
+
+ <section class="panel">
+  <h2>🅿️ Live Parking Slots</h2>
+  <p class="muted">Slot availability and bookings update from Firebase.</p>
+  <div id="slots">Waiting for parking data…</div>
+ </section>
+
  <div class="grid">
-  <section class="panel"><h2>🔎 Find My Car</h2><p class="muted">View your saved venue, floor, zone and pillar details.</p><div id="savedLocations">No saved locations yet.</div></section>
-  <section class="panel"><h2>🕘 Recent Activity</h2><div id="history">No history yet.</div><button id="clearHistory" class="secondary">Clear History</button></section>
+  <section class="panel">
+   <h2>🔎 Find My Car</h2>
+   <p class="muted">View your saved venue, floor, zone and pillar details.</p>
+   <div id="savedLocations">No saved locations yet.</div>
+  </section>
+  <section class="panel">
+   <h2>🕘 Recent Activity</h2>
+   <div id="history">No history yet.</div>
+   <button id="clearHistory" class="secondary">Clear History</button>
+  </section>
  </div>
- <section class="panel"><h2>About your saved data</h2><p class="muted">Saved locations and activity history stay in this browser. Firebase bookings are shared through the database. Local saved locations do not automatically transfer to another device.</p></section>
+
+ <section class="panel">
+  <h2>About your saved data</h2>
+  <p class="muted">Saved locations and activity history stay in this browser. Firebase bookings are shared through the database. Local saved locations do not automatically transfer to another device.</p>
+ </section>
 </main>
+
 <script type="module">
 import {initializeApp} from "https://www.gstatic.com/firebasejs/13.0.0/firebase-app.js";
 import {getAuth,signInAnonymously} from "https://www.gstatic.com/firebasejs/13.0.0/firebase-auth.js";
@@ -69,90 +95,241 @@ const cfg={
  messagingSenderId:"423958538578",
  appId:"1:423958538578:web:b7c5395f8348e3a00f728b"
 };
+
 const app=initializeApp(cfg),auth=getAuth(app),db=getDatabase(app);
 const $=id=>document.getElementById(id),slotIds=["slot1","slot2","slot3","slot4"];
 let uid=null,sensors={},bookings={},currentLocation=null,sensorLoaded=false,bookingLoaded=false;
+
 const esc=x=>String(x??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-function status(v){if(v&&typeof v==="object")v=v.status??v.state??v.occupancy??v.value;const s=String(v??"").trim().toUpperCase();if(["AVAILABLE","FREE","EMPTY","0"].includes(s))return"AVAILABLE";if(["OCCUPIED","FULL","1"].includes(s))return"OCCUPIED";return"UNKNOWN"}
-function active(b){return !!b&&["ACTIVE","BOOKED"].includes(String(b.status||"").toUpperCase())}
-function readHistory(){try{const x=JSON.parse(localStorage.getItem("ps_history")||"[]");return Array.isArray(x)?x:[]}catch{return[]}}
-function addHistory(title,detail){const x=readHistory();x.unshift({title,detail,time:new Date().toLocaleString()});localStorage.setItem("ps_history",JSON.stringify(x.slice(0,40)));renderHistory()}
-function renderHistory(){$("history").innerHTML=readHistory().map(x=>`<div class="item"><strong>${esc(x.title)}</strong><div>${esc(x.detail)}</div><small class="muted">${esc(x.time)}</small></div>`).join("")||'<p class="muted">No history yet.</p>'}
-function readSaved(){try{const x=JSON.parse(localStorage.getItem("ps_locations")||"[]");return Array.isArray(x)?x:[]}catch{return[]}}
-function writeSaved(x){localStorage.setItem("ps_locations",JSON.stringify(x.slice(0,50)));renderSaved()}
-function describe(l){return[l.venueName||"Parking venue",l.floor,l.zone,l.pillar,l.locationType].filter(Boolean).join(" · ")}
-function renderSaved(){
- $("savedLocations").innerHTML=readSaved().map((l,i)=>`<div class="item"><strong>${esc(l.venueName||"Saved parking")}</strong><div>${esc(describe(l))}</div><small class="muted">${esc(l.savedAt||"")}</small><div><button data-view="${i}">View Details</button><button class="danger" data-remove="${i}">Remove</button></div></div>`).join("")||'<p class="muted">No saved locations yet. Scan a ParkSmart QR code first.</p>';
- document.querySelectorAll("[data-view]").forEach(b=>b.onclick=()=>{const l=readSaved()[+b.dataset.view];if(l)alert("Saved parking location:\n\n"+describe(l))});
- document.querySelectorAll("[data-remove]").forEach(b=>b.onclick=()=>{const x=readSaved(),i=+b.dataset.remove;if(!x[i]||!confirm("Remove this saved location?"))return;const l=x.splice(i,1)[0];writeSaved(x);addHistory("Removed parking location",describe(l))});
+
+function status(v){
+ if(v&&typeof v==="object")v=v.status??v.state??v.occupancy??v.value;
+ const s=String(v??"").trim().toUpperCase();
+ if(["AVAILABLE","FREE","EMPTY","0"].includes(s))return"AVAILABLE";
+ if(["OCCUPIED","FULL","1"].includes(s))return"OCCUPIED";
+ return"UNKNOWN";
 }
+
+function active(b){return !!b&&["ACTIVE","BOOKED"].includes(String(b.status||"").toUpperCase())}
+
+function readHistory(){
+ try{const x=JSON.parse(localStorage.getItem("ps_history")||"[]");return Array.isArray(x)?x:[]}
+ catch{return[]}
+}
+
+function addHistory(title,detail){
+ const x=readHistory();
+ x.unshift({title,detail,time:new Date().toLocaleString()});
+ localStorage.setItem("ps_history",JSON.stringify(x.slice(0,40)));
+ renderHistory();
+}
+
+function renderHistory(){
+ $("history").innerHTML=readHistory().map(x=>`<div class="item"><strong>${esc(x.title)}</strong><div>${esc(x.detail)}</div><small class="muted">${esc(x.time)}</small></div>`).join("")||'<p class="muted">No history yet.</p>';
+}
+
+function readSaved(){
+ try{const x=JSON.parse(localStorage.getItem("ps_locations")||"[]");return Array.isArray(x)?x:[]}
+ catch{return[]}
+}
+
+function writeSaved(x){
+ localStorage.setItem("ps_locations",JSON.stringify(x.slice(0,50)));
+ renderSaved();
+}
+
+/* QR label-ஐ venue details-க்கு முன் காட்டும் */
+function describe(l){
+ return [l.label,l.venueName||"Parking venue",l.floor,l.zone,l.pillar,l.locationType]
+  .filter(Boolean).join(" · ");
+}
+
+function renderSaved(){
+ $("savedLocations").innerHTML=readSaved().map((l,i)=>`<div class="item"><strong>${esc(l.label||l.venueName||"Saved parking")}</strong><div>${esc(describe(l))}</div><small class="muted">${esc(l.savedAt||"")}</small><div><button data-view="${i}">View Details</button><button class="danger" data-remove="${i}">Remove</button></div></div>`).join("")||'<p class="muted">No saved locations yet. Scan a ParkSmart QR code first.</p>';
+
+ document.querySelectorAll("[data-view]").forEach(b=>b.onclick=()=>{
+  const l=readSaved()[+b.dataset.view];
+  if(l)alert("Saved parking location:\n\n"+describe(l));
+ });
+
+ document.querySelectorAll("[data-remove]").forEach(b=>b.onclick=()=>{
+  const x=readSaved(),i=+b.dataset.remove;
+  if(!x[i]||!confirm("Remove this saved location?"))return;
+  const l=x.splice(i,1)[0];
+  writeSaved(x);
+  addHistory("Removed parking location",describe(l));
+ });
+}
+
 function renderSlots(){
  const available=slotIds.filter(id=>status(sensors[id])==="AVAILABLE"&&!active(bookings[id])).length;
  const occupied=slotIds.filter(id=>status(sensors[id])==="OCCUPIED").length;
  const booked=slotIds.filter(id=>active(bookings[id])).length;
- $("availableCount").textContent=available;$("occupiedCount").textContent=occupied;$("bookingCount").textContent=booked;$("slots").className="slots";
+
+ $("availableCount").textContent=available;
+ $("occupiedCount").textContent=occupied;
+ $("bookingCount").textContent=booked;
+ $("slots").className="slots";
+
  $("slots").innerHTML=slotIds.map(id=>{
   const s=status(sensors[id]),b=active(bookings[id])?bookings[id]:null,mine=!!(b&&uid&&b.uid===uid);
   const can=!!uid&&sensorLoaded&&bookingLoaded&&s==="AVAILABLE"&&!b;
   const action=mine?`<button class="secondary" data-cancel="${id}">Cancel My Booking</button>`:can?`<button data-book="${id}">Book Slot</button>`:`<button disabled>${s==="UNKNOWN"?"Sensor Unknown":b?"Reserved":s==="OCCUPIED"?"Occupied":"Unavailable"}</button>`;
-  const label=s==="AVAILABLE"?"Available":s==="OCCUPIED"?"Occupied":"Unknown",cls=s==="AVAILABLE"?"good":s==="OCCUPIED"?"bad":"warn";
+  const label=s==="AVAILABLE"?"Available":s==="OCCUPIED"?"Occupied":"Unknown";
+  const cls=s==="AVAILABLE"?"good":s==="OCCUPIED"?"bad":"warn";
+
   return `<article class="slot"><span class="badge">${esc(id)}</span><h3>${esc(id.replace("slot","Slot "))}</h3><p class="${cls}">Slot status: ${label}</p><p>Booking: ${b?(mine?"Your booking":"Reserved"):"Not booked"}</p>${action}</article>`;
  }).join("");
+
  document.querySelectorAll("[data-book]").forEach(b=>b.onclick=()=>book(b.dataset.book));
  document.querySelectorAll("[data-cancel]").forEach(b=>b.onclick=()=>cancel(b.dataset.cancel));
 }
+
 async function book(id){
  if(!uid){alert("Firebase is not ready.");return}
  if(status(sensors[id])!=="AVAILABLE"){alert("This slot is not currently available.");return}
- const name=prompt("Your name (optional):")||"",vehicle=prompt("Vehicle number (optional):")||"";
+
+ const name=prompt("Your name (optional):")||"";
+ const vehicle=prompt("Vehicle number (optional):")||"";
+
  try{
   const r=await runTransaction(ref(db,"parksmart/bookings/"+id),old=>{
-   if(old&&active(old))return;if(status(sensors[id])!=="AVAILABLE")return;
+   if(old&&active(old))return;
+   if(status(sensors[id])!=="AVAILABLE")return;
    return{uid,slot:id,status:"ACTIVE",name:name.trim(),vehicle:vehicle.trim(),createdAt:Date.now(),source:"consumer"};
   });
-  if(r.committed&&r.snapshot.val()?.uid===uid){addHistory("Booked "+id,"Booking saved to Firebase.");alert("Booking successful.");}
-  else alert("Booking not saved. The slot may already be reserved.");
+
+  if(r.committed&&r.snapshot.val()?.uid===uid){
+   addHistory("Booked "+id,"Booking saved to Firebase.");
+   alert("Booking successful.");
+  }else alert("Booking not saved. The slot may already be reserved.");
  }catch(e){alert("Booking failed: "+e.message)}
 }
+
 async function cancel(id){
  if(!confirm("Cancel your booking for "+id+"?"))return;
+
  try{
   const r=await runTransaction(ref(db,"parksmart/bookings/"+id),old=>{
    if(!old||old.uid!==uid||!active(old))return;
    return{...old,status:"CANCELLED",cancelledAt:Date.now()};
   });
-  if(r.committed&&String(r.snapshot.val()?.status||"").toUpperCase()==="CANCELLED"){addHistory("Cancelled "+id,"Booking cancellation saved to Firebase.");alert("Booking cancelled.");}
-  else alert("Booking was not cancelled. Please refresh and check its status.");
+
+  if(r.committed&&String(r.snapshot.val()?.status||"").toUpperCase()==="CANCELLED"){
+   addHistory("Cancelled "+id,"Booking cancellation saved to Firebase.");
+   alert("Booking cancelled.");
+  }else alert("Booking was not cancelled. Please refresh and check its status.");
  }catch(e){alert("Cancellation failed: "+e.message)}
 }
+
 function showLocation(l,source){
- currentLocation=l;$("qrLocation").innerHTML=`<strong>${esc(l.venueName||"Parking location")}</strong><p>${esc(describe(l))}</p>${l.locationId?`<p class="muted">Location ID: ${esc(l.locationId)}</p>`:""}<p class="muted">${source==="qr"?"Loaded from QR link.":"Loaded from saved parking."}</p>`;$("saveQrLocation").disabled=false;
+ currentLocation=l;
+ $("qrLocation").innerHTML=`<strong>${esc(l.label||l.venueName||"Parking location")}</strong><p>${esc(describe(l))}</p>${l.locationId?`<p class="muted">Location ID: ${esc(l.locationId)}</p>`:""}<p class="muted">${source==="qr"?"Loaded from QR link.":"Loaded from saved parking."}</p>`;
+ $("saveQrLocation").disabled=false;
 }
+
 async function loadLocation(){
  const id=new URLSearchParams(location.search).get("locationId");
- if(!id){$("qrLocation").innerHTML='<p class="muted">No QR location in this link. Scan a QR code created in ParkSmart Admin.</p>';return}
+
+ if(!id){
+  $("qrLocation").innerHTML='<p class="muted">No QR location in this link. Scan a QR code created in ParkSmart Admin.</p>';
+  return;
+ }
+
  try{
   const s=await get(ref(db,"parksmart/locations/"+id));
-  if(!s.exists()){$("qrLocation").innerHTML='<p class="warn">Location not found. Confirm it was saved in Admin and Firebase rules permit reading it.</p>';return}
-  const d=s.val();let venueName=d.venueName||"Parking venue";
-  if(d.venueId){try{const v=await get(ref(db,"parksmart/venues/"+d.venueId));if(v.exists())venueName=v.val().name||venueName}catch{}}
-  showLocation({locationId:id,venueId:d.venueId||"",venueName,floor:d.floor||"",zone:d.zone||"",pillar:d.pillar||"",locationType:d.locationType||""},"qr");
- }catch(e){$("qrLocation").innerHTML='<p class="bad">Location load failed: '+esc(e.message)+'</p>'}
+
+  if(!s.exists()){
+   $("qrLocation").innerHTML='<p class="warn">Location not found. Confirm it was saved in Admin and Firebase rules permit reading it.</p>';
+   return;
+  }
+
+  const d=s.val();
+  let venueName=d.venueName||"Parking venue";
+
+  if(d.venueId){
+   try{
+    const v=await get(ref(db,"parksmart/venues/"+d.venueId));
+    if(v.exists())venueName=v.val().name||venueName;
+   }catch{}
+  }
+
+  showLocation({
+   locationId:id,
+   venueId:d.venueId||"",
+   label:d.label||d.slotNumber||d.slot||"",
+   venueName,
+   floor:d.floor||"",
+   zone:d.zone||"",
+   pillar:d.pillar||"",
+   locationType:d.locationType||""
+  },"qr");
+
+ }catch(e){
+  $("qrLocation").innerHTML='<p class="bad">Location load failed: '+esc(e.message)+'</p>';
+ }
 }
+
 $("saveQrLocation").onclick=()=>{
- if(!currentLocation)return;const x=readSaved();
- if(currentLocation.locationId&&x.some(l=>l.locationId===currentLocation.locationId)){alert("This location is already saved.");return}
- const item={...currentLocation,savedAt:new Date().toLocaleString()};x.unshift(item);writeSaved(x);addHistory("Saved parking location",describe(item));alert("Parking location saved in this browser.");
+ if(!currentLocation)return;
+
+ const x=readSaved();
+
+ if(currentLocation.locationId&&x.some(l=>l.locationId===currentLocation.locationId)){
+  alert("This location is already saved.");
+  return;
+ }
+
+ const item={...currentLocation,savedAt:new Date().toLocaleString()};
+ x.unshift(item);
+ writeSaved(x);
+ addHistory("Saved parking location",describe(item));
+ alert("Parking location saved in this browser.");
 };
-$("clearHistory").onclick=()=>{if(confirm("Clear activity history from this browser?")){localStorage.removeItem("ps_history");renderHistory()}};
-renderHistory();renderSaved();renderSlots();
+
+$("clearHistory").onclick=()=>{
+ if(confirm("Clear activity history from this browser?")){
+  localStorage.removeItem("ps_history");
+  renderHistory();
+ }
+};
+
+renderHistory();
+renderSaved();
+renderSlots();
+
 try{
- const c=await signInAnonymously(auth);uid=c.user.uid;
- $("connection").textContent="● Firebase connected";$("connection").style.color="var(--green)";
- onValue(ref(db,"parksmart/slots"),s=>{sensors=s.val()||{};sensorLoaded=true;renderSlots()},e=>{$("connection").textContent="Sensor read error: "+e.message;$("connection").style.color="var(--red)"});
- onValue(ref(db,"parksmart/bookings"),s=>{bookings=s.val()||{};bookingLoaded=true;renderSlots()},e=>{$("connection").textContent="Booking read error: "+e.message;$("connection").style.color="var(--red)"});
+ const c=await signInAnonymously(auth);
+ uid=c.user.uid;
+
+ $("connection").textContent="● Firebase connected";
+ $("connection").style.color="var(--green)";
+
+ onValue(ref(db,"parksmart/slots"),s=>{
+  sensors=s.val()||{};
+  sensorLoaded=true;
+  renderSlots();
+ },e=>{
+  $("connection").textContent="Sensor read error: "+e.message;
+  $("connection").style.color="var(--red)";
+ });
+
+ onValue(ref(db,"parksmart/bookings"),s=>{
+  bookings=s.val()||{};
+  bookingLoaded=true;
+  renderSlots();
+ },e=>{
+  $("connection").textContent="Booking read error: "+e.message;
+  $("connection").style.color="var(--red)";
+ });
+
  await loadLocation();
-}catch(e){$("connection").textContent="Firebase error: "+e.message;$("connection").style.color="var(--red)";$("qrLocation").innerHTML='<p class="warn">Check internet, Anonymous Authentication and Firebase Rules.</p>'}
+
+}catch(e){
+ $("connection").textContent="Firebase error: "+e.message;
+ $("connection").style.color="var(--red)";
+ $("qrLocation").innerHTML='<p class="warn">Check internet, Anonymous Authentication and Firebase Rules.</p>';
+}
 </script>
 </body>
 </html>
