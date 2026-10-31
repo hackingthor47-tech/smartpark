@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -40,7 +41,6 @@ button:focus-visible,input:focus-visible,select:focus-visible{
 .soft{background:#1a3049;color:#dcecff;border-color:#2b4968}
 .wrap{display:flex;min-height:100vh}
 
-/* Sidebar */
 aside{
   width:258px;flex:0 0 258px;background:#091727ef;border-right:1px solid var(--line);
   padding:25px 17px;position:fixed;inset:0 auto 0 0;overflow:auto;z-index:20;
@@ -58,7 +58,6 @@ aside{
 }
 .nav.active,.nav:hover{background:linear-gradient(100deg,#153653,#102840);color:#fff;border-color:#285274}
 
-/* Main */
 main{margin-left:258px;width:calc(100% - 258px);padding:32px clamp(20px,3vw,48px);max-width:1800px}
 .top{
   display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;
@@ -70,7 +69,6 @@ h2{font-size:17px;letter-spacing:-.2px;margin:0}
 .user{background:#10243a;padding:10px 14px;border:1px solid var(--line);border-radius:13px}
 .menu-toggle{display:none}
 
-/* Pages and cards */
 .page{display:none}
 .page.active{display:block;animation:fade .22s ease}
 @keyframes fade{from{opacity:.55;transform:translateY(4px)}to{opacity:1;transform:none}}
@@ -83,7 +81,6 @@ h2{font-size:17px;letter-spacing:-.2px;margin:0}
 .panel{margin-bottom:19px;padding:clamp(16px,2vw,23px)}
 .panel-head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:17px}
 
-/* Forms */
 .form{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:13px}
 input,select{
   width:100%;padding:12px 13px;background:#081626;color:var(--text);
@@ -94,7 +91,6 @@ input:focus,select:focus{border-color:var(--blue);box-shadow:0 0 0 3px #258bff20
 label{font-size:11px;color:#a7bdd2;display:block;margin-bottom:7px;font-weight:750;letter-spacing:.5px;text-transform:uppercase}
 .field{min-width:0}
 
-/* Tables */
 .table-wrap{overflow-x:auto;border:1px solid #1e354c;border-radius:12px}
 table{width:100%;border-collapse:collapse;min-width:680px;background:#0a1828}
 th,td{padding:14px 13px;border-bottom:1px solid #1c3147;text-align:left;font-size:13px;white-space:nowrap}
@@ -108,7 +104,6 @@ tbody tr:last-child td{border-bottom:0}
 .actions{display:flex;gap:7px;flex-wrap:wrap}
 .actions button{font-size:11px;padding:8px 10px}
 
-/* QR */
 .qrgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:15px}
 .qrbox{background:linear-gradient(145deg,#102238,#0a1828);border:1px solid var(--line);border-radius:16px;padding:17px;text-align:center;min-width:0;overflow-wrap:anywhere}
 .qrimage{background:white;padding:10px;display:inline-block;border-radius:10px;margin:13px auto;min-height:170px;min-width:170px}
@@ -116,11 +111,9 @@ tbody tr:last-child td{border-bottom:0}
 .empty{text-align:center;color:var(--muted);padding:30px}
 .notice{padding:14px 16px;border-radius:12px;background:#102b45;border:1px solid #214e70;color:#c1e1ff;font-size:13px;margin-bottom:16px}
 
-/* Login */
 .login{max-width:430px;margin:12vh auto;padding:34px;background:linear-gradient(145deg,#10243a,#0b1929);border:1px solid var(--line);border-radius:22px;text-align:center;box-shadow:var(--shadow)}
 .login button{width:100%;margin-top:15px}
 
-/* Responsive */
 @media(min-width:1500px){main{padding-left:52px;padding-right:52px}.grid{gap:20px}.panel{padding:25px}}
 @media(max-width:1050px){
   aside{width:220px;flex-basis:220px}
@@ -174,7 +167,7 @@ tbody tr:last-child td{border-bottom:0}
   <div style="font-size:35px">🅿️</div>
   <h1>ParkSmart Admin</h1>
   <p class="muted">Sign in with your authorized Google account</p>
-  <button class="primary" onclick="login()">Continue with Google</button>
+  <button class="primary" id="googleLoginBtn">Continue with Google</button>
   <p id="loginError" class="muted"></p>
 </div>
 
@@ -294,6 +287,7 @@ tbody tr:last-child td{border-bottom:0}
 </div>
 
 <script>
+/* FIREBASE CONFIGURATION */
 const firebaseConfig = {
   apiKey: "AIzaSyAsffyVnKES_-tZz3pnuojPLPFBk3TJe5E",
   authDomain: "smartpark-9ecbb.firebaseapp.com",
@@ -303,60 +297,599 @@ const firebaseConfig = {
   messagingSenderId: "423958538578",
   appId: "1:423958538578:web:b7c5395f8348e3a00f728b"
 };
-firebase.initializeApp(firebaseConfig);
-const auth=firebase.auth(), db=firebase.database();
-const ADMIN_EMAIL="hackingthor47@gmail.com";
-let currentUser=null,venues={},bookings={},qrs={},sensors={},listeners=[];
 
-function login(){
-  auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()).catch(e=>{
-    document.getElementById("loginError").textContent=e.message;
-  });
+firebase.initializeApp(firebaseConfig);
+
+const auth = firebase.auth();
+const db = firebase.database();
+const ADMIN_EMAIL = "hackingthor47@gmail.com";
+
+let currentUser = null;
+let venues = {};
+let bookings = {};
+let qrs = {};
+let sensors = {};
+let listeners = [];
+
+/* GOOGLE LOGIN - FIXED */
+document.getElementById("googleLoginBtn").addEventListener("click", async function () {
+  const errorBox = document.getElementById("loginError");
+  errorBox.textContent = "Opening Google sign-in...";
+
+  try {
+    const provider = new firebase.auth.GoogleAuthProvider();
+    provider.setCustomParameters({ prompt: "select_account" });
+    await auth.signInWithPopup(provider);
+    errorBox.textContent = "";
+  } catch (error) {
+    console.error("Google Login Error:", error);
+    errorBox.textContent = error.message;
+  }
+});
+
+/* AUTH STATE */
+function logout() {
+  auth.signOut();
 }
-function logout(){auth.signOut();}
-auth.onAuthStateChanged(user=>{
-  currentUser=user;
-  if(user && user.email===ADMIN_EMAIL){
-    document.getElementById("loginScreen").style.display="none";
-    document.getElementById("app").style.display="flex";
-    document.getElementById("adminName").textContent=user.displayName||user.email;
-    document.getElementById("loginError").textContent="";
+
+auth.onAuthStateChanged(user => {
+  currentUser = user;
+
+  if (user && user.email && user.email.toLowerCase() === ADMIN_EMAIL.toLowerCase()) {
+    document.getElementById("loginScreen").style.display = "none";
+    document.getElementById("app").style.display = "flex";
+    document.getElementById("adminName").textContent = user.displayName || user.email;
+    document.getElementById("loginError").textContent = "";
     startData();
-  }else{
-    document.getElementById("loginScreen").style.display="block";
-    document.getElementById("app").style.display="none";
-    if(user){
-      document.getElementById("loginError").textContent="This Google account is not authorized as admin.";
+  } else {
+    document.getElementById("loginScreen").style.display = "block";
+    document.getElementById("app").style.display = "none";
+
+    if (user) {
+      document.getElementById("loginError").textContent =
+        "This Google account is not authorized as admin.";
       auth.signOut();
     }
   }
 });
 
-function watch(path,callback){
-  const ref=db.ref(path);ref.on("value",s=>callback(s.val()||{}));listeners.push(ref);
+/* FIREBASE DATA LISTENERS */
+function watch(path, callback) {
+  const ref = db.ref(path);
+  ref.on("value", snapshot => callback(snapshot.val() || {}), error => {
+    console.error("Firebase read error:", path, error);
+  });
+  listeners.push(ref);
 }
-function startData(){
-  listeners.forEach(ref=>ref.off());listeners=[];
-  watch("parksmart/venues",v=>{venues=v;renderVenues();renderQRVenueOptions();renderOverview();renderReports();});
-  watch("parksmart/bookings",v=>{bookings=v;renderHistory();renderOverview();renderReports();});
-  watch("parksmart/locations",v=>{qrs=v;renderQRs();renderOverview();});
-  watch("parksmart/slots",v=>{sensors=v;renderOverview();renderReports();});
+
+function startData() {
+  listeners.forEach(ref => ref.off());
+  listeners = [];
+
+  watch("parksmart/venues", v => {
+    venues = v;
+    renderVenues();
+    renderQRVenueOptions();
+    renderOverview();
+    renderReports();
+  });
+
+  watch("parksmart/bookings", v => {
+    bookings = v;
+    renderHistory();
+    renderOverview();
+    renderReports();
+  });
+
+  watch("parksmart/locations", v => {
+    qrs = v;
+    renderQRs();
+    renderOverview();
+  });
+
+  watch("parksmart/slots", v => {
+    sensors = v;
+    renderOverview();
+    renderReports();
+  });
 }
-function toggleMobileMenu(){document.getElementById("sidebar").classList.toggle("open");}
-function showPage(name){
-  document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+
+/* NAVIGATION */
+function toggleMobileMenu() {
+  document.getElementById("sidebar").classList.toggle("open");
+}
+
+function showPage(name) {
+  document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
   document.getElementById(name).classList.add("active");
-  document.querySelectorAll(".nav[data-page]").forEach(b=>b.classList.toggle("active",b.dataset.page===name));
-  const titles={overview:"Admin Overview",venues:"Venue Management",qrs:"QR Management",history:"Booking History",reports:"Parking Reports"};
-  document.getElementById("pageTitle").textContent=titles[name]||"Admin";
+
+  document.querySelectorAll(".nav[data-page]").forEach(b => {
+    b.classList.toggle("active", b.dataset.page === name);
+  });
+
+  const titles = {
+    overview: "Admin Overview",
+    venues: "Venue Management",
+    qrs: "QR Management",
+    history: "Booking History",
+    reports: "Parking Reports"
+  };
+
+  document.getElementById("pageTitle").textContent = titles[name] || "Admin";
   document.getElementById("sidebar").classList.remove("open");
 }
-document.querySelectorAll(".nav[data-page]").forEach(b=>b.addEventListener("click",()=>showPage(b.dataset.page)));
 
-function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
-function time(v){return v?new Date(Number(v)).toLocaleString():"—";}
+document.querySelectorAll(".nav[data-page]").forEach(b => {
+  b.addEventListener("click", () => showPage(b.dataset.page));
+});
 
-/* Accepts strings, booleans, numbers, or common sensor-object shapes. */
-function sensorStatus(slot){
-  const raw=sensors[slot];
-  if(raw===t
+/* HELPERS */
+function esc(s) {
+  return String(s ?? "").replace(/[&<>"']/g, c => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;"
+  }[c]));
+}
+
+function time(v) {
+  return v ? new Date(Number(v)).toLocaleString() : "—";
+}
+
+/* SENSOR STATUS */
+function sensorStatus(slot) {
+  const raw = sensors[slot];
+
+  if (raw === true || raw === 1) return "OCCUPIED";
+  if (raw === false || raw === 0) return "AVAILABLE";
+  if (raw == null) return "UNKNOWN";
+
+  let value = raw;
+
+  if (typeof raw === "object") {
+    value = raw.status ?? raw.state ?? raw.value ??
+      raw.occupancy ?? raw.occupied ?? "UNKNOWN";
+
+    if (value === true || value === 1) return "OCCUPIED";
+    if (value === false || value === 0) return "AVAILABLE";
+  }
+
+  const s = String(value).trim().toUpperCase();
+
+  if (["1", "TRUE", "OCCUPIED", "FULL", "DETECTED", "PARKED"].includes(s))
+    return "OCCUPIED";
+
+  if (["0", "FALSE", "AVAILABLE", "EMPTY", "FREE", "CLEAR"].includes(s))
+    return "AVAILABLE";
+
+  return s || "UNKNOWN";
+}
+
+function activeBooking(slot) {
+  return Object.values(bookings).some(b =>
+    b && String(b.slot) === String(slot) &&
+    String(b.status).toUpperCase() === "ACTIVE"
+  );
+}
+
+function displayStatus(slot) {
+  const sensor = sensorStatus(slot);
+
+  if (sensor === "OCCUPIED") return "OCCUPIED";
+  if (sensor === "AVAILABLE" && activeBooking(slot)) return "RESERVED";
+
+  return sensor;
+}
+
+/* OVERVIEW */
+function renderOverview() {
+  const bs = Object.values(bookings).filter(Boolean);
+  const active = bs.filter(b => b.status === "ACTIVE").length;
+  const cancel = bs.filter(b => b.status === "CANCELLED").length;
+
+  document.getElementById("mVenues").textContent = Object.keys(venues).length;
+  document.getElementById("mBookings").textContent = bs.length;
+  document.getElementById("mActive").textContent = active;
+  document.getElementById("mCancelled").textContent = cancel;
+  document.getElementById("mQR").textContent = Object.keys(qrs).length;
+
+  const slots = ["slot1", "slot2", "slot3", "slot4"];
+  const statuses = slots.map(displayStatus);
+
+  document.getElementById("mAvailable").textContent =
+    statuses.filter(x => x === "AVAILABLE").length;
+
+  document.getElementById("mOccupied").textContent =
+    statuses.filter(x => x === "OCCUPIED").length;
+
+  document.getElementById("mReserved").textContent =
+    statuses.filter(x => x === "RESERVED").length;
+
+  document.getElementById("sensorCards").innerHTML = slots.map((s, i) => {
+    const st = displayStatus(s);
+    const raw = sensorStatus(s);
+
+    return `<div class="card">
+      <div class="muted">Slot ${i + 1}</div>
+      <div class="metric" style="font-size:20px">${esc(st)}</div>
+      <p class="muted">Physical sensor: ${esc(raw)}</p>
+      <p class="muted">Booking: ${activeBooking(s) ? "ACTIVE" : "None"}</p>
+    </div>`;
+  }).join("");
+
+  const recent = [...bs]
+    .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0))
+    .slice(0, 5);
+
+  document.getElementById("recentRows").innerHTML = recent.length
+    ? recent.map(b => `<tr>
+        <td>${esc(b.name)}</td>
+        <td>${esc(b.slot)}</td>
+        <td>${esc(b.venueName || "ESEC")}</td>
+        <td>${esc(b.status)}</td>
+        <td>${time(b.createdAt)}</td>
+      </tr>`).join("")
+    : `<tr><td colspan="5" class="empty">No bookings yet</td></tr>`;
+}
+
+/* VENUE MANAGEMENT */
+async function addVenue() {
+  const name = document.getElementById("venueName").value.trim();
+  const address = document.getElementById("venueAddress").value.trim();
+  const count = Number(document.getElementById("venueSlots").value);
+  const mode = document.getElementById("venueMode").value;
+  const type = document.getElementById("venueType").value;
+  const area = document.getElementById("venueArea").value.trim();
+  const notes = document.getElementById("venueNotes").value.trim();
+
+  if (!name || !count || count < 1 || count > 100) {
+    alert("Enter venue name and a valid slot count (1–100).");
+    return;
+  }
+
+  if (mode === "LIVE_ESP32" && count !== 4) {
+    alert("Live ESP32 demo supports exactly 4 slots.");
+    return;
+  }
+
+  if (mode === "LIVE_ESP32" &&
+      Object.values(venues).some(v => v.hardwareMode === "LIVE_ESP32")) {
+    alert("Only one LIVE ESP32 venue is supported by this demo.");
+    return;
+  }
+
+  try {
+    await db.ref("parksmart/venues").push({
+      name,
+      address,
+      slotCount: count,
+      hardwareMode: mode,
+      venueType: type,
+      cityArea: area,
+      notes,
+      hardwareSource: mode === "LIVE_ESP32" ? "parksmart/slots" : "MANUAL",
+      createdAt: Date.now(),
+      createdBy: currentUser.email
+    });
+
+    ["venueName", "venueAddress", "venueArea", "venueNotes"].forEach(id => {
+      document.getElementById(id).value = "";
+    });
+
+    document.getElementById("venueSlots").value = "4";
+    alert("Venue added successfully.");
+  } catch (e) {
+    alert("Could not add venue: " + e.message);
+  }
+}
+
+function renderVenues() {
+  const entries = Object.entries(venues);
+
+  document.getElementById("venueCount").textContent = entries.length + " venues";
+
+  document.getElementById("venueRows").innerHTML = entries.length
+    ? entries.map(([id, v]) => `<tr>
+        <td><b>${esc(v.name)}</b><br>
+        <span class="muted">${esc(v.venueType || "")}${v.cityArea ? " · " + esc(v.cityArea) : ""}</span></td>
+        <td>${esc(v.address || "—")}</td>
+        <td>${v.slotCount || 4}</td>
+        <td><span class="pill ${v.hardwareMode === "LIVE_ESP32" ? "live" : "manual"}">${esc(v.hardwareMode || "MANUAL")}</span></td>
+        <td><button class="danger" onclick="deleteVenue('${id}')">Delete</button></td>
+      </tr>`).join("")
+    : `<tr><td colspan="5" class="empty">No venues added</td></tr>`;
+}
+
+async function deleteVenue(id) {
+  const v = venues[id];
+  if (!v) return;
+
+  if (!confirm(`Delete venue "${v.name}"? Its QR location records will also be deleted. Booking history will be retained.`))
+    return;
+
+  try {
+    const updates = {};
+    updates["parksmart/venues/" + id] = null;
+
+    Object.entries(qrs).forEach(([qid, q]) => {
+      if (q.venueId === id) updates["parksmart/locations/" + qid] = null;
+    });
+
+    await db.ref().update(updates);
+    alert("Venue and its QR records deleted. Booking history retained.");
+  } catch (e) {
+    alert("Delete failed: " + e.message);
+  }
+}
+
+/* QR MANAGEMENT */
+function renderQRVenueOptions() {
+  const select = document.getElementById("qrVenue");
+  const old = select.value;
+
+  select.innerHTML = Object.entries(venues)
+    .map(([id, v]) => `<option value="${esc(id)}">${esc(v.name)}</option>`)
+    .join("");
+
+  if (old && venues[old]) select.value = old;
+}
+
+async function generateQR() {
+  const venueId = document.getElementById("qrVenue").value;
+  const label = document.getElementById("qrLabel").value.trim();
+  const venue = venues[venueId];
+
+  const locationType = document.getElementById("qrType").value;
+  const floor = document.getElementById("qrFloor").value.trim();
+  const zone = document.getElementById("qrZone").value.trim();
+  const pillar = document.getElementById("qrPillar").value.trim();
+
+  if (!venueId || !venue || !label) {
+    alert("Select a venue and enter a location label.");
+    return;
+  }
+
+  try {
+    const ref = db.ref("parksmart/locations").push();
+    const locationId = ref.key;
+
+    const url = `https://hackingthor47-tech.github.io/smartpark/consumer.html?locationId=${encodeURIComponent(locationId)}`;
+
+    await ref.set({
+      venueId,
+      venueName: venue.name,
+      label,
+      locationType,
+      floor,
+      zone,
+      pillar,
+      venueType: venue.venueType || "",
+      cityArea: venue.cityArea || "",
+      url,
+      createdAt: Date.now(),
+      createdBy: currentUser.email
+    });
+
+    ["qrLabel", "qrFloor", "qrZone", "qrPillar"].forEach(id => {
+      document.getElementById(id).value = "";
+    });
+
+    alert("QR location created. Download it from the QR list.");
+  } catch (e) {
+    alert("QR creation failed: " + e.message);
+  }
+}
+
+function renderQRs() {
+  const list = Object.entries(qrs);
+
+  document.getElementById("qrCount").textContent = list.length + " QR codes";
+
+  document.getElementById("qrGrid").innerHTML = list.length
+    ? list.map(([id, q]) => `<div class="qrbox">
+        <b>${esc(q.label)}</b>
+        <p class="muted">${esc(q.venueName || "")}</p>
+        <p class="muted">${[q.floor, q.zone, q.pillar, q.locationType].filter(Boolean).map(esc).join(" · ")}</p>
+        <div class="qrimage" id="qr-${esc(id)}"></div>
+        <div class="actions" style="justify-content:center">
+          <button class="primary" onclick="downloadQR('${id}')">Download PNG</button>
+          <button class="danger" onclick="deleteQR('${id}')">Delete</button>
+        </div>
+      </div>`).join("")
+    : `<div class="empty">No QR codes generated yet</div>`;
+
+  list.forEach(([id, q]) => {
+    const node = document.getElementById("qr-" + id);
+    if (!node) return;
+
+    node.innerHTML = "";
+
+    new QRCode(node, {
+      text: q.url || location.href,
+      width: 150,
+      height: 150,
+      correctLevel: QRCode.CorrectLevel.H
+    });
+  });
+}
+
+function downloadQR(id) {
+  const node = document.querySelector(`#qr-${CSS.escape(id)} canvas`) ||
+               document.querySelector(`#qr-${CSS.escape(id)} img`);
+
+  if (!node) {
+    alert("QR is not ready yet.");
+    return;
+  }
+
+  const a = document.createElement("a");
+  a.href = node.tagName === "CANVAS" ? node.toDataURL("image/png") : node.src;
+  a.download = `ParkSmart-${id}.png`;
+  a.click();
+}
+
+async function deleteQR(id) {
+  if (!qrs[id] || !confirm("Delete this QR location? Booking history will remain."))
+    return;
+
+  try {
+    await db.ref("parksmart/locations/" + id).remove();
+  } catch (e) {
+    alert("Delete failed: " + e.message);
+  }
+}
+
+/* BOOKING HISTORY */
+function renderHistory() {
+  const filter = document.getElementById("historyFilter").value;
+  const search = document.getElementById("historySearch").value.toLowerCase();
+
+  let rows = Object.entries(bookings).filter(([id, b]) =>
+    b && (filter === "ALL" || b.status === filter)
+  );
+
+  rows = rows.filter(([id, b]) =>
+    [b.name, b.email, b.vehicle, b.slot, b.venueName, id]
+      .join(" ").toLowerCase().includes(search)
+  );
+
+  rows.sort((a, b) => (b[1].createdAt || 0) - (a[1].createdAt || 0));
+
+  document.getElementById("historyRows").innerHTML = rows.length
+    ? rows.map(([id, b]) => `<tr>
+        <td>${esc(b.name)}</td>
+        <td>${esc(b.email || "—")}</td>
+        <td>${esc(b.vehicle || "—")}</td>
+        <td>${esc(b.venueName || "ESEC")}</td>
+        <td>${esc(b.slot)}</td>
+        <td><span class="pill ${b.status === "ACTIVE" ? "active" : "cancelled"}">${esc(b.status)}</span></td>
+        <td>${time(b.createdAt)}</td>
+        <td><button class="danger" onclick="deleteBooking('${id}')">Delete</button></td>
+      </tr>`).join("")
+    : `<tr><td colspan="8" class="empty">No matching booking records</td></tr>`;
+}
+
+async function deleteBooking(id) {
+  if (!bookings[id] || !confirm("Permanently delete this booking history record?"))
+    return;
+
+  try {
+    await db.ref("parksmart/bookings/" + id).remove();
+  } catch (e) {
+    alert("Delete failed: " + e.message);
+  }
+}
+
+async function clearHistory() {
+  const n = Object.keys(bookings).length;
+
+  if (!n) {
+    alert("Booking history is already empty.");
+    return;
+  }
+
+  if (!confirm(`Permanently delete all ${n} booking history records? This cannot be undone.`) ||
+      !confirm("Final confirmation: Clear ALL booking history?"))
+    return;
+
+  try {
+    await db.ref("parksmart/bookings").remove();
+    alert("Booking history cleared. Other ParkSmart data was not changed.");
+  } catch (e) {
+    alert("Clear failed: " + e.message);
+  }
+}
+
+/* CSV EXPORT */
+function csvCell(v) {
+  return '"' + String(v ?? "").replace(/"/g, '""') + '"';
+}
+
+function downloadCSV(filename, rows) {
+  const csv = "\uFEFF" + rows.map(r => r.map(csvCell).join(",")).join("\r\n");
+  const blob = new Blob([csv], {type: "text/csv;charset=utf-8;"});
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  a.click();
+
+  URL.revokeObjectURL(url);
+}
+
+function bookingRows() {
+  return [
+    ["Booking ID", "Name", "Email", "Vehicle", "Venue", "Slot", "Status", "Booked At", "Cancelled At"],
+    ...Object.entries(bookings)
+      .filter(([id, b]) => b)
+      .map(([id, b]) => [
+        id, b.name, b.email, b.vehicle, b.venueName,
+        b.slot, b.status, time(b.createdAt), time(b.cancelledAt)
+      ])
+  ];
+}
+
+function downloadBookings() {
+  downloadCSV("ParkSmart-Booking-History.csv", bookingRows());
+}
+
+/* REPORTS */
+function renderReports() {
+  const bs = Object.values(bookings).filter(Boolean);
+  const active = bs.filter(b => b.status === "ACTIVE").length;
+  const cancel = bs.filter(b => b.status === "CANCELLED").length;
+
+  document.getElementById("rTotal").textContent = bs.length;
+  document.getElementById("rActive").textContent = active;
+  document.getElementById("rCancelled").textContent = cancel;
+  document.getElementById("rVenues").textContent = Object.keys(venues).length;
+
+  document.getElementById("reportVenueRows").innerHTML =
+    Object.entries(venues).map(([id, v]) => `<tr>
+      <td>${esc(v.name)}</td>
+      <td>${esc(v.hardwareMode || "MANUAL")}</td>
+      <td>${v.slotCount || 4}</td>
+      <td>${bs.filter(b => b.venueId === id && b.status === "ACTIVE").length}</td>
+    </tr>`).join("") ||
+    `<tr><td colspan="4" class="empty">No venues</td></tr>`;
+}
+
+function downloadReport() {
+  const bs = Object.values(bookings).filter(Boolean);
+
+  const rows = [
+    ["PARKSMART PARKING REPORT"],
+    ["Generated At", new Date().toLocaleString()],
+    [],
+    ["Metric", "Value"],
+    ["Total Venues", Object.keys(venues).length],
+    ["Total Bookings", bs.length],
+    ["Active Bookings", bs.filter(b => b.status === "ACTIVE").length],
+    ["Cancelled Bookings", bs.filter(b => b.status === "CANCELLED").length],
+    [],
+    ["Venue", "Hardware Mode", "Slot Count", "Active Bookings"]
+  ];
+
+  Object.entries(venues).forEach(([id, v]) => {
+    rows.push([
+      v.name,
+      v.hardwareMode || "MANUAL",
+      v.slotCount || 4,
+      bs.filter(b => b.venueId === id && b.status === "ACTIVE").length
+    ]);
+  });
+
+  rows.push([], ["Slot", "Physical Sensor", "Display Status"]);
+
+  ["slot1", "slot2", "slot3", "slot4"].forEach(s => {
+    rows.push([s, sensorStatus(s), displayStatus(s)]);
+  });
+
+  downloadCSV("ParkSmart-Parking-Report.csv", rows);
+}
+</script>
+</body>
+</html>
