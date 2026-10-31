@@ -1,88 +1,66 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>ParkSmart | Hardware Dashboard</title>
 
 <style>
-:root {
-  --bg: #061426;
-  --panel: rgba(5, 23, 44, .88);
-  --line: rgba(99, 190, 255, .35);
-  --blue: #13b9ff;
-  --green: #00e5a0;
-  --red: #ff5267;
-  --yellow: #ffc247;
+:root{
+  --blue:#32caff;--green:#00e5a0;--red:#ff536d;--yellow:#ffc247;
+  --panel:rgba(5,17,32,.91);--line:rgba(113,190,255,.32);
 }
-* { box-sizing: border-box; }
-body {
-  margin: 0;
-  color: #f4f9ff;
-  font-family: Arial, sans-serif;
+*{box-sizing:border-box}
+body{
+  margin:0;min-height:100vh;color:#f4f9ff;
+  font-family:Inter,Segoe UI,Arial,sans-serif;
   background:
-    linear-gradient(180deg, rgba(3,13,27,.82), rgba(3,13,27,.94)),
-    repeating-linear-gradient(90deg, transparent 0 150px, rgba(255,255,255,.035) 151px 153px),
-    repeating-linear-gradient(0deg, #142b42 0 2px, #07182b 2px 100px);
-  min-height: 100vh;
+    linear-gradient(90deg,rgba(2,10,22,.85),rgba(2,10,22,.55),rgba(2,10,22,.85)),
+    linear-gradient(0deg,rgba(2,10,22,.65),rgba(2,10,22,.12)),
+    url("https://images.unsplash.com/photo-1590674899484-d5640e854a?auto=format&fit=crop&w=2200&q=85")
+    center/cover fixed;
 }
-body:before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  background:
-    radial-gradient(ellipse at 50% 0%, rgba(15,145,255,.2), transparent 50%),
-    linear-gradient(115deg, transparent 48%, rgba(255,255,255,.025) 49%, transparent 50%);
-}
-main { max-width: 1450px; margin: auto; padding: 24px; position: relative; }
-header { display:flex; align-items:center; justify-content:space-between; gap:20px; flex-wrap:wrap; margin-bottom:22px; }
-.brand { display:flex; align-items:center; gap:14px; }
-.logo { font-size:42px; color:var(--blue); }
-h1 { margin:0; font-size:clamp(26px,4vw,40px); }
-h1 span { color:var(--blue); }
-.subtitle { color:#a9c5df; margin-top:5px; }
-.connection { border:1px solid var(--line); border-radius:30px; padding:12px 18px; color:var(--green); background:#062a35; }
-.summary { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:20px; }
-.metric, .panel { background:var(--panel); border:1px solid var(--line); border-radius:20px; box-shadow:0 12px 35px #0005; backdrop-filter:blur(8px); }
-.metric { padding:18px; display:flex; align-items:center; gap:14px; }
-.metric-icon { font-size:34px; }
-.metric small { color:#a9c5df; display:block; }
-.metric strong { display:block; font-size:30px; margin-top:4px; }
-.content { display:grid; grid-template-columns:minmax(0, 2fr) minmax(280px, .9fr); gap:18px; }
-.panel { padding:20px; }
-.panel h2 { margin:0 0 5px; font-size:23px; }
-.hint { color:#9fbad4; margin:0 0 18px; }
-.slots { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; }
-.slot { border:1px solid var(--line); border-radius:16px; padding:16px; background:rgba(3,15,31,.78); min-width:0; }
-.slot-top { display:flex; justify-content:space-between; gap:8px; align-items:center; }
-.slot h3 { margin:0; font-size:20px; }
-.status { border-radius:22px; padding:7px 11px; font-weight:bold; font-size:13px; white-space:nowrap; }
-.available { color:var(--green); background:#003c32; border:1px solid #007d66; }
-.occupied { color:var(--red); background:#451a2b; border:1px solid #a62c48; }
-.reserved { color:var(--yellow); background:#443217; border:1px solid #956b1b; }
-.vehicle { text-align:center; font-size:78px; padding:13px 0 5px; filter:drop-shadow(0 8px 8px #0009); }
-.slot-info { color:#b8d0e8; font-size:14px; line-height:1.8; }
-.slot-info b { color:#fff; }
-.gates { display:grid; gap:14px; }
-.gate { border:1px solid var(--line); border-radius:16px; padding:16px; background:rgba(3,15,31,.78); }
-.gate-top { display:flex; justify-content:space-between; align-items:center; gap:10px; }
-.gate-icon { font-size:30px; color:var(--blue); }
-.gate p { color:#a9c5df; margin:8px 0 0; }
-.gate-state { color:var(--green); font-weight:bold; }
-footer { display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; margin-top:18px; padding:15px 18px; border:1px solid var(--line); border-radius:16px; background:var(--panel); color:#aac7e2; }
-button { background:linear-gradient(135deg,#00a8ff,#1268ff); color:white; border:0; border-radius:24px; padding:12px 20px; font-weight:bold; cursor:pointer; }
-@media(max-width:900px) {
-  .summary { grid-template-columns:repeat(2,1fr); }
-  .content { grid-template-columns:1fr; }
-}
-@media(max-width:560px) {
-  main { padding:14px; }
-  .slots { grid-template-columns:1fr; }
-  .metric { padding:13px; }
-  .metric strong { font-size:24px; }
-  .panel { padding:14px; }
-}
+main{max-width:1500px;margin:auto;padding:25px;position:relative}
+header{display:flex;justify-content:space-between;align-items:center;gap:18px;flex-wrap:wrap;margin-bottom:24px}
+.brand{display:flex;align-items:center;gap:14px}
+.logo{font-size:45px;color:var(--blue);filter:drop-shadow(0 0 12px #00baff)}
+h1{font-size:clamp(28px,4vw,42px);margin:0;letter-spacing:-1px}
+h1 span{color:var(--blue)}
+.subtitle{color:#b6cee4;margin-top:5px}
+.connection{padding:12px 17px;border:1px solid #00b989;border-radius:30px;background:#06352f;color:#59ffd2;font-weight:700}
+.summary{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px}
+.metric,.panel{background:var(--panel);border:1px solid var(--line);border-radius:20px;box-shadow:0 12px 35px #0007;backdrop-filter:blur(9px)}
+.metric{padding:18px;display:flex;align-items:center;gap:14px}
+.metric-icon{font-size:32px}
+.metric small{display:block;color:#a9c5df}
+.metric strong{display:block;font-size:30px;margin-top:4px}
+.content{display:grid;grid-template-columns:minmax(0,2fr) minmax(280px,.9fr);gap:18px}
+.panel{padding:20px}
+.panel h2{margin:0 0 5px;font-size:23px}
+.hint{color:#9fbad4;margin:0 0 18px}
+.slots{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.slot{min-width:0;overflow:hidden;border:1px solid var(--line);border-radius:17px;background:rgba(3,13,27,.86)}
+.slot-top{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:15px 15px 0}
+.slot h3{margin:0;font-size:20px}
+.status{border-radius:22px;padding:7px 11px;font-weight:700;font-size:12px;white-space:nowrap}
+.available{color:var(--green);background:#003c32;border:1px solid #007d66}
+.occupied{color:var(--red);background:#451a2b;border:1px solid #a62c48}
+.reserved{color:var(--yellow);background:#443217;border:1px solid #956b1b}
+.vehicle{height:150px;display:flex;align-items:center;justify-content:center;padding:8px 12px}
+.vehicle img{width:100%;height:140px;object-fit:contain;filter:drop-shadow(0 12px 12px #0009)}
+.slot-info{padding:12px 15px 15px;color:#b8d0e8;font-size:14px;line-height:1.8;border-top:1px solid #ffffff12}
+.slot-info b{color:#fff}
+.gates{display:grid;gap:14px}
+.gate{border:1px solid var(--line);border-radius:16px;padding:17px;background:rgba(3,13,27,.82)}
+.gate-top{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.gate-icon{font-size:32px;color:var(--blue)}
+.gate h3{margin:12px 0 7px}
+.gate p{color:#a9c5df;margin:0}
+.gate-state{color:var(--green);font-weight:700}
+footer{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-top:18px;padding:15px 18px;border:1px solid var(--line);border-radius:16px;background:var(--panel);color:#aac7e2}
+button{background:linear-gradient(135deg,#00a8ff,#1268ff);color:white;border:0;border-radius:24px;padding:12px 20px;font-weight:700;cursor:pointer}
+@media(max-width:900px){.summary{grid-template-columns:repeat(2,1fr)}.content{grid-template-columns:1fr}}
+@media(max-width:560px){main{padding:13px}.slots{grid-template-columns:1fr}.metric{padding:13px}.metric strong{font-size:24px}.panel{padding:14px}.connection{font-size:13px}}
 </style>
 </head>
 
@@ -109,21 +87,21 @@ button { background:linear-gradient(135deg,#00a8ff,#1268ff); color:white; border
   <section class="content">
     <div class="panel">
       <h2>🚘 Live Parking Slots</h2>
-      <p class="hint">Real-time status from parking sensors</p>
+      <p class="hint">Live status from your parking sensors</p>
       <div class="slots" id="slots"></div>
     </div>
 
     <div class="panel">
-      <h2>🚧 Gate Status</h2>
-      <p class="hint">Entry and exit monitoring</p>
+      <h2>🚧 Gate Monitoring</h2>
+      <p class="hint">Entry and exit sensor status</p>
       <div class="gates">
         <div class="gate">
           <div class="gate-top"><span class="gate-icon">↘</span><span class="gate-state" id="entryState">Waiting…</span></div>
-          <h3>Entry Gate</h3><p id="entryDetail">No vehicle detected</p>
+          <h3>Entry Gate</h3><p id="entryDetail">Waiting for sensor data</p>
         </div>
         <div class="gate">
           <div class="gate-top"><span class="gate-icon">↗</span><span class="gate-state" id="exitState">Waiting…</span></div>
-          <h3>Exit Gate</h3><p id="exitDetail">No vehicle detected</p>
+          <h3>Exit Gate</h3><p id="exitDetail">Waiting for sensor data</p>
         </div>
       </div>
     </div>
@@ -136,83 +114,88 @@ button { background:linear-gradient(135deg,#00a8ff,#1268ff); color:white; border
 </main>
 
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+import {initializeApp} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import {getAuth,signInAnonymously} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import {getDatabase,ref,onValue} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
-const firebaseConfig = {
-  apiKey: "AIzaSyAsffyVnKES_-tZz3pnuojPLPFBk3TJe5E",
-  authDomain: "smartpark-9ecbb.firebaseapp.com",
-  databaseURL: "https://smartpark-9ecbb-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "smartpark-9ecbb",
-  storageBucket: "smartpark-9ecbb.firebasestorage.app",
-  messagingSenderId: "423958538578",
-  appId: "1:423958538578:web:b7c5395f8348e3a00f728b"
+const firebaseConfig={
+  apiKey:"AIzaSyAsffyVnKES_-tZz3pnuojPLPFBk3TJe5E",
+  authDomain:"smartpark-9ecbb.firebaseapp.com",
+  databaseURL:"https://smartpark-9ecbb-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId:"smartpark-9ecbb",
+  storageBucket:"smartpark-9ecbb.firebasestorage.app",
+  messagingSenderId:"423958538578",
+  appId:"1:423958538578:web:b7c5395f8348e3a00f728b"
 };
 
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getDatabase(app);
+const app=initializeApp(firebaseConfig);
+const auth=getAuth(app);
+const db=getDatabase(app);
 
-const normalize = value => String(value ?? "").toUpperCase();
-const reserved = value => normalize(value).includes("RESERVED") || normalize(value).includes("BOOKED");
-const occupied = value => normalize(value).includes("OCCUPIED");
-const statusOf = value => reserved(value) ? "Reserved" : occupied(value) ? "Occupied" : "Available";
+const normalize=value=>String(value??"").toUpperCase();
+const isReserved=value=>normalize(value).includes("RESERVED")||normalize(value).includes("BOOKED");
+const isOccupied=value=>normalize(value).includes("OCCUPIED");
 
-function renderSlots(slots = {}, bookings = {}) {
-  let available = 0, occupiedTotal = 0, reservedTotal = 0;
-  document.getElementById("slots").innerHTML = [1,2,3,4].map(n => {
-    const id = `slot${n}`;
-    const sensor = slots[id] ?? "UNKNOWN";
-    const booking = bookings[id];
-    const isReserved = booking && !normalize(booking.status).includes("CANCEL");
-    const status = isReserved ? "Reserved" : statusOf(sensor);
-    if (status === "Available") available++;
-    if (status === "Occupied") occupiedTotal++;
-    if (status === "Reserved") reservedTotal++;
+function renderSlots(slots={},bookings={}){
+  let available=0,occupied=0,reserved=0;
 
-    const cls = status.toLowerCase();
-    const car = status === "Available" ? "🚙" : status === "Reserved" ? "🚘" : "🚗";
+  document.getElementById("slots").innerHTML=[1,2,3,4].map(n=>{
+    const id=`slot${n}`;
+    const sensor=slots[id]??"UNKNOWN";
+    const booking=bookings[id];
+    const hasBooking=booking && !normalize(booking.status).includes("CANCEL");
+    const status=hasBooking?"Reserved":isReserved(sensor)?"Reserved":isOccupied(sensor)?"Occupied":"Available";
+
+    if(status==="Available")available++;
+    if(status==="Occupied")occupied++;
+    if(status==="Reserved")reserved++;
+
+    const carImage=status==="Available"
+      ?"https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?auto=format&fit=crop&w=900&q=85"
+      :status==="Reserved"
+      ?"https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=900&q=85"
+      :"https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?auto=format&fit=crop&w=900&q=85";
+
     return `<article class="slot">
-      <div class="slot-top"><h3>Slot ${n}</h3><span class="status ${cls}">${status}</span></div>
-      <div class="vehicle" aria-label="vehicle">${car}</div>
-      <div class="slot-info">Sensor: <b>${normalize(sensor)}</b><br>Booking: <b>${isReserved ? "Reserved" : "None"}</b></div>
+      <div class="slot-top"><h3>Parking Slot ${n}</h3><span class="status ${status.toLowerCase()}">${status}</span></div>
+      <div class="vehicle"><img src="${carImage}" alt="Vehicle in slot ${n}" loading="lazy"></div>
+      <div class="slot-info">Sensor: <b>${normalize(sensor)}</b><br>Booking: <b>${hasBooking?"Reserved":"None"}</b></div>
     </article>`;
   }).join("");
 
-  document.getElementById("availableCount").textContent = available;
-  document.getElementById("occupiedCount").textContent = occupiedTotal;
-  document.getElementById("reservedCount").textContent = reservedTotal;
-  document.getElementById("updated").textContent = "Last updated: " + new Date().toLocaleString();
+  document.getElementById("availableCount").textContent=available;
+  document.getElementById("occupiedCount").textContent=occupied;
+  document.getElementById("reservedCount").textContent=reserved;
+  document.getElementById("updated").textContent="Last updated: "+new Date().toLocaleString();
 }
 
-function setGate(name, value) {
-  const v = normalize(value);
-  const active = v.includes("DETECT") || v.includes("OPEN") || v.includes("ENTER") || v === "1";
-  document.getElementById(name + "State").textContent = active ? "● ACTIVE" : "● CLOSED";
-  document.getElementById(name + "Detail").textContent = active ? "Vehicle detected" : "No vehicle detected";
+function setGate(name,value){
+  const v=normalize(value);
+  const active=v.includes("DETECT")||v.includes("OPEN")||v.includes("ENTER")||v==="1";
+  document.getElementById(name+"State").textContent=active?"● VEHICLE DETECTED":"● CLEAR";
+  document.getElementById(name+"Detail").textContent=active?"Vehicle detected by sensor":"No vehicle detected";
 }
 
-signInAnonymously(auth).then(() => {
-  document.getElementById("connection").textContent = "● Firebase Connected";
-  let slots = {}, bookings = {};
+signInAnonymously(auth).then(()=>{
+  document.getElementById("connection").textContent="● Firebase Connected";
+  let slots={},bookings={};
 
-  onValue(ref(db, "parksmart/slots"), snap => {
-    slots = snap.val() || {};
-    renderSlots(slots, bookings);
-  }, error => {
-    document.getElementById("connection").textContent = "Firebase read error: " + error.message;
+  onValue(ref(db,"parksmart/slots"),snap=>{
+    slots=snap.val()||{};
+    renderSlots(slots,bookings);
+  },error=>{
+    document.getElementById("connection").textContent="Firebase read error: "+error.message;
   });
 
-  onValue(ref(db, "parksmart/bookings"), snap => {
-    bookings = snap.val() || {};
-    renderSlots(slots, bookings);
+  onValue(ref(db,"parksmart/bookings"),snap=>{
+    bookings=snap.val()||{};
+    renderSlots(slots,bookings);
   });
 
-  onValue(ref(db, "parksmart/gate/entry"), snap => setGate("entry", snap.val()));
-  onValue(ref(db, "parksmart/gate/exit"), snap => setGate("exit", snap.val()));
-}).catch(error => {
-  document.getElementById("connection").textContent = "Firebase login error: " + error.message;
+  onValue(ref(db,"parksmart/gate/entry"),snap=>setGate("entry",snap.val()));
+  onValue(ref(db,"parksmart/gate/exit"),snap=>setGate("exit",snap.val()));
+}).catch(error=>{
+  document.getElementById("connection").textContent="Firebase login error: "+error.message;
 });
 </script>
 </body>
