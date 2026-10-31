@@ -2,475 +2,98 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ParkSmart | Smart Parking</title>
-
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#06101f">
+<title>ParkSmart | Smart Parking System</title>
 <style>
-:root {
-  --bg: #061225;
-  --panel: #0b2038;
-  --cyan: #4bd4ff;
-  --blue: #087cf0;
-  --muted: #a9bdd5;
-  --white: #f5f9ff;
-}
-
-* { box-sizing: border-box; }
-
-html { scroll-behavior: smooth; }
-
-body {
-  margin: 0;
-  background: var(--bg);
-  color: var(--white);
-  font-family: Inter, "Segoe UI", Arial, sans-serif;
-}
-
-a {
-  color: inherit;
-  text-decoration: none;
-}
-
-/* NAVIGATION */
-.nav {
-  height: 78px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 clamp(24px, 5vw, 80px);
-  background: #041126;
-  border-bottom: 1px solid #1b2c43;
-  position: sticky;
-  top: 0;
-  z-index: 5;
-}
-
-.brand {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  font-weight: 850;
-  font-size: 22px;
-  color: #60d7ff;
-  letter-spacing: -.5px;
-}
-
-.mark {
-  height: 44px;
-  width: 44px;
-  border-radius: 13px;
-  background: linear-gradient(145deg, #37d7ff, #0873e9);
-  display: grid;
-  place-items: center;
-  box-shadow: 0 0 25px #13a9ff55;
-}
-
-.mark svg { width: 25px; }
-
-.links {
-  display: flex;
-  align-items: center;
-  gap: 30px;
-  font-size: 14px;
-  font-weight: 650;
-  color: #d5e1f0;
-}
-
-.links a:hover { color: var(--cyan); }
-
-.adminbtn,
-.primary {
-  background: linear-gradient(110deg, #12b9f5, #0872ed);
-  border: 1px solid #36caff66;
-  border-radius: 13px;
-  padding: 15px 22px;
-  color: white;
-  font-weight: 800;
-  box-shadow: 0 8px 25px #008ff533;
-}
-
-/* HERO */
-.hero {
-  min-height: 590px;
-  position: relative;
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-  padding: 76px clamp(24px, 7vw, 108px);
-
-  background:
-    linear-gradient(90deg,
-      #061225 0%,
-      #061225ed 32%,
-      #0612259c 58%,
-      #06122520 100%),
-    linear-gradient(0deg, #061225 0%, transparent 45%),
-    url("https://images.unsplash.com/photo-1506521781263-d8422e82f27a?auto=format&fit=crop&w=2200&q=85")
-      center / cover no-repeat;
-}
-
-.hero::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background:
-    radial-gradient(ellipse at 78% 35%, #3a536544, transparent 50%),
-    linear-gradient(0deg, #061225 0%, transparent 40%);
-  pointer-events: none;
-}
-
-.herocopy {
-  position: relative;
-  z-index: 1;
-  max-width: 690px;
-}
-
-.eyebrow {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  border: 1px solid #2a7697;
-  background: #0b2b43b8;
-  color: #a9edff;
-  border-radius: 99px;
-  padding: 10px 15px;
-  font-size: 12px;
-  font-weight: 850;
-  letter-spacing: 1.2px;
-}
-
-.dot {
-  height: 8px;
-  width: 8px;
-  border-radius: 50%;
-  background: #21e0b2;
-  box-shadow: 0 0 12px #21e0b2;
-}
-
-h1 {
-  font-size: clamp(46px, 5.1vw, 76px);
-  line-height: 1.06;
-  letter-spacing: -2.7px;
-  margin: 30px 0 20px;
-  font-weight: 850;
-}
-
-h1 span {
-  display: block;
-  color: var(--cyan);
-}
-
-.lead {
-  font-size: 18px;
-  line-height: 1.65;
-  color: #c0d0e3;
-  max-width: 650px;
-  margin: 0 0 28px;
-}
-
-.actions {
-  display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
-}
-
-.secondary {
-  border: 1px solid #2c496a;
-  background: #0b2038d9;
-  border-radius: 13px;
-  padding: 15px 22px;
-  font-weight: 800;
-}
-
-.checks {
-  display: flex;
-  gap: 26px;
-  flex-wrap: wrap;
-  margin-top: 36px;
-  color: #c0d2e5;
-  font-size: 13px;
-}
-
-.checks span::before {
-  content: "✓";
-  color: #26dfb1;
-  font-size: 19px;
-  font-weight: 900;
-  margin-right: 8px;
-}
-
-/* DASHBOARD CARDS */
-.workspaces {
-  padding: 74px clamp(24px, 8.2vw, 126px) 88px;
-}
-
-.sectiontag {
-  color: var(--cyan);
-  font-size: 12px;
-  font-weight: 900;
-  letter-spacing: 2px;
-}
-
-.workspaces h2 {
-  font-size: clamp(28px, 3vw, 40px);
-  letter-spacing: -1.2px;
-  margin: 14px 0 12px;
-}
-
-.sub {
-  color: var(--muted);
-  margin: 0 0 30px;
-}
-
-.cards {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 20px;
-}
-
-.card {
-  position: relative;
-  min-height: 300px;
-  padding: 28px 27px 25px;
-  border-radius: 23px;
-  border: 1px solid #203d5b;
-  background: linear-gradient(145deg, #102c49, #081a30);
-  display: flex;
-  flex-direction: column;
-  transition: transform .2s, border-color .2s, box-shadow .2s;
-  overflow: hidden;
-}
-
-.card:hover {
-  transform: translateY(-5px);
-  border-color: #3aa9d8;
-  box-shadow: 0 16px 40px #0004;
-}
-
-.cardtop {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.ico {
-  width: 55px;
-  height: 55px;
-  border-radius: 16px;
-  background: #12466a;
-  display: grid;
-  place-items: center;
-  color: #a6eaff;
-}
-
-.ico svg {
-  width: 28px;
-  height: 28px;
-}
-
-.number {
-  font-size: 54px;
-  line-height: 1;
-  color: #ffffff19;
-  font-weight: 900;
-  letter-spacing: -2px;
-}
-
-.card h3 {
-  font-size: 22px;
-  margin: 28px 0 14px;
-  letter-spacing: -.4px;
-}
-
-.card p {
-  color: #afc3db;
-  line-height: 1.6;
-  font-size: 14px;
-  margin: 0 0 26px;
-}
-
-.card .open {
-  margin-top: auto;
-  color: #55d8ff;
-  font-size: 15px;
-  font-weight: 850;
-}
-
-.open b {
-  font-size: 20px;
-  margin-left: 5px;
-}
-
-/* MOBILE */
-@media (max-width: 900px) {
-  .links { gap: 16px; }
-  .cards { grid-template-columns: 1fr; }
-  .card { min-height: 250px; }
-  .hero { min-height: 570px; }
-  .workspaces { padding-top: 55px; }
-}
-
-@media (max-width: 650px) {
-  .nav {
-    height: 68px;
-    padding: 0 16px;
-  }
-
-  .brand { font-size: 19px; }
-
-  .mark {
-    width: 39px;
-    height: 39px;
-  }
-
-  .links a:not(.adminbtn) { display: none; }
-
-  .adminbtn {
-    padding: 12px 13px;
-    font-size: 12px;
-  }
-
-  .hero {
-    padding: 60px 23px;
-    min-height: 600px;
-  }
-
-  h1 { letter-spacing: -1.6px; }
-
-  .lead { font-size: 16px; }
-
-  .checks { gap: 12px; }
-
-  .workspaces { padding: 52px 20px 64px; }
-
-  .card { padding: 23px; }
-
-  .number { font-size: 45px; }
-}
+:root{--bg:#06101f;--panel:#0b2037;--line:#244663;--text:#f4f8ff;--muted:#a9bfd5;--cyan:#42d2ff;--blue:#087cff;--green:#00d6a0}
+*{box-sizing:border-box}html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,"Segoe UI",Arial,sans-serif;line-height:1.6}
+a{color:inherit;text-decoration:none}
+header{padding:15px 5%;display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;background:#041022ed;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:10}
+.brand{display:flex;align-items:center;gap:11px;font-size:23px;font-weight:850}
+.brand-icon{width:43px;height:43px;display:grid;place-items:center;background:linear-gradient(140deg,#43d7ff,#087cff);border-radius:13px;font-size:24px}
+.brand span:last-child{color:var(--cyan)}
+nav{display:flex;align-items:center;gap:24px;flex-wrap:wrap}
+nav a{color:#c0d3e7;font-size:14px;font-weight:650}
+nav a:hover{color:var(--cyan)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border-radius:12px;padding:12px 19px;font-weight:750;border:1px solid transparent}
+.primary{background:linear-gradient(135deg,#1cbcff,#0870f5);color:white}
+.secondary{background:#0b2037;border-color:#31516d;color:white}
+.hero{min-height:590px;position:relative;display:flex;align-items:center;padding:80px 7%;overflow:hidden;background:linear-gradient(90deg,#031022f7 0%,#031022dc 48%,#03102255 100%),url("https://images.unsplash.com/photo-1506521781263-d8422e82f27a?auto=format&fit=crop&w=2200&q=90") center/cover}
+.hero:after{content:"";position:absolute;inset:auto 0 0;height:120px;background:linear-gradient(transparent,var(--bg))}
+.hero-content{max-width:720px;position:relative;z-index:1}
+.eyebrow{display:inline-flex;align-items:center;gap:9px;padding:7px 13px;border:1px solid #2a7198;border-radius:30px;color:#a5eaff;background:#062342d9;font-size:12px;letter-spacing:1.2px;text-transform:uppercase;font-weight:800}
+.dot{height:8px;width:8px;border-radius:50%;background:var(--green)}
+h1{font-size:clamp(40px,6.2vw,76px);line-height:1.05;letter-spacing:-2.5px;margin:24px 0 20px}
+h1 em{font-style:normal;color:var(--cyan)}
+.hero p{font-size:18px;max-width:610px;color:#c2d3e5;margin-bottom:30px}
+.actions{display:flex;gap:12px;flex-wrap:wrap}
+.trust{display:flex;gap:25px;flex-wrap:wrap;margin-top:35px;color:#bfd0e2;font-size:13px}
+.trust span:before{content:"✓";color:var(--green);font-weight:900;margin-right:8px}
+.section{max-width:1320px;padding:70px 24px;margin:auto}
+.section-head{display:flex;align-items:end;justify-content:space-between;gap:20px;flex-wrap:wrap;margin-bottom:28px}
+.kicker{color:var(--cyan);font-size:12px;font-weight:850;letter-spacing:2px;text-transform:uppercase}
+h2{font-size:clamp(27px,4vw,40px);letter-spacing:-1px;line-height:1.2;margin:8px 0}
+.section-head p,.intro{color:var(--muted);margin:8px 0 0;max-width:650px}
+.cards,.steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px}
+.card{position:relative;overflow:hidden;border-radius:20px;border:1px solid var(--line);background:linear-gradient(150deg,#102b47,#07172b);padding:26px;min-height:270px;transition:.25s}
+.card:hover{transform:translateY(-5px);border-color:#42d2ff9c}
+.card .icon{width:54px;height:54px;display:grid;place-items:center;border-radius:15px;background:#103e61;color:var(--cyan);font-size:27px;margin-bottom:24px}
+.card h3{font-size:22px;margin:0 0 10px}
+.card p{color:var(--muted);font-size:14px;min-height:68px}
+.card-link{display:inline-flex;align-items:center;gap:8px;color:var(--cyan);font-weight:800;margin-top:9px}
+.number{position:absolute;right:20px;top:18px;color:#ffffff17;font-size:60px;font-weight:900}
+.step{padding:24px 0;border-top:1px solid var(--line)}
+.step-num{color:var(--cyan);font-size:13px;font-weight:850;letter-spacing:1px}
+.step h3{margin:12px 0 8px;font-size:20px}
+.step p{color:var(--muted);font-size:14px;margin:0}
+.banner{border:1px solid #24618b;border-radius:24px;padding:clamp(25px,5vw,50px);background:linear-gradient(110deg,#0c2d4b,#07172b);display:flex;align-items:center;justify-content:space-between;gap:25px;flex-wrap:wrap}
+.banner h2{max-width:620px}.banner p{color:var(--muted);max-width:650px}
+footer{border-top:1px solid var(--line);padding:26px 5%;display:flex;justify-content:space-between;gap:15px;flex-wrap:wrap;color:var(--muted);font-size:13px;background:#030c19}
+footer strong{color:white}
+@media(max-width:850px){.cards,.steps{grid-template-columns:1fr}.hero{min-height:540px;padding:65px 6%}.card p{min-height:0}}
+@media(max-width:550px){header{padding:12px 4%}nav{gap:12px}nav a{font-size:12px}.hero{min-height:550px;padding:55px 5%}h1{letter-spacing:-1.5px}.hero p{font-size:16px}.trust{gap:12px}.section{padding:48px 16px}}
 </style>
 </head>
-
 <body>
-
-<header class="nav">
-  <a class="brand" href="index.html">
-    <span class="mark">
-      <svg viewBox="0 0 24 24" fill="none" stroke="#fff"
-           stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M5 4h14v16H5z"/>
-        <path d="M9 16V8h4a3 3 0 0 1 0 6H9"/>
-      </svg>
-    </span>
-    ParkSmart
-  </a>
-
-  <nav class="links" aria-label="Main navigation">
-    <a href="#features">Features</a>
-    <a href="#how">How it works</a>
-    <a href="consumer.html">Consumer</a>
-    <a href="hardware.html">Hardware</a>
-    <a class="adminbtn" href="admin.html">Admin Dashboard ↗</a>
-  </nav>
+<header>
+ <a class="brand" href="./index.html"><span class="brand-icon">🅿</span><span>Park<span>Smart</span></span></a>
+ <nav>
+  <a href="#features">Features</a><a href="#how">How it works</a>
+  <a href="./consumer.html">Consumer</a><a href="./hardware.html">Hardware</a>
+  <a class="btn primary" href="./admin.html">Admin Dashboard ↗</a>
+ </nav>
 </header>
-
-<main>
-  <section class="hero" id="how">
-    <div class="herocopy">
-      <div class="eyebrow">
-        <span class="dot"></span>
-        SMART PARKING · CONNECTED MOBILITY
-      </div>
-
-      <h1>
-        Parking made
-        <span>simple &amp; smart.</span>
-      </h1>
-
-      <p class="lead">
-        Find available parking, reserve your spot, remember where you parked,
-        and monitor occupancy with one connected parking platform.
-      </p>
-
-      <div class="actions">
-        <a class="primary" href="consumer.html">Find Parking&nbsp; →</a>
-        <a class="secondary" href="hardware.html">Explore Live Hardware ↗</a>
-      </div>
-
-      <div class="checks">
-        <span>Live sensor dashboard</span>
-        <span>QR location saving</span>
-        <span>Connected parking</span>
-      </div>
-    </div>
-  </section>
-
-  <section class="workspaces" id="features">
-    <div class="sectiontag">ONE PLATFORM · THREE WORKSPACES</div>
-    <h2>Everything parking, in one place.</h2>
-    <p class="sub">Choose the workspace that matches what you want to do.</p>
-
-    <div class="cards">
-
-      <a class="card" href="consumer.html">
-        <div class="cardtop">
-          <span class="ico">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                 stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-              <path d="m3 13 2-6h14l2 6v6H3z"/>
-              <path d="M5 13h14M7 17h.01M17 17h.01M7 7l1-3h8l1 3"/>
-            </svg>
-          </span>
-          <span class="number">01</span>
-        </div>
-        <h3>Consumer Dashboard</h3>
-        <p>
-          Check parking slot status, book or cancel a slot, scan a parking QR
-          code, and save your car’s location for later.
-        </p>
-        <span class="open">Open Consumer Dashboard <b>→</b></span>
-      </a>
-
-      <a class="card" href="hardware.html">
-        <div class="cardtop">
-          <span class="ico">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                 stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M4 20h16M7 16l10-10M5 8l3-3 3 3M13 16l3 3 3-3"/>
-              <circle cx="12" cy="12" r="2"/>
-            </svg>
-          </span>
-          <span class="number">02</span>
-        </div>
-        <h3>Hardware Dashboard</h3>
-        <p>
-          Monitor ESP32-connected parking sensors, available and occupied
-          slots, and entry/exit gate status.
-        </p>
-        <span class="open">Open Hardware Dashboard <b>→</b></span>
-      </a>
-
-      <a class="card" href="admin.html">
-        <div class="cardtop">
-          <span class="ico">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                 stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-              <path d="m14 7 3-3 3 3-3 3M4 20l8-8M8 4l2 2-2 2-2-2z"/>
-              <path d="m15 14 5 5-2 2-5-5M3 13l3-3 3 3-3 3z"/>
-            </svg>
-          </span>
-          <span class="number">03</span>
-        </div>
-        <h3>Admin Dashboard</h3>
-        <p>
-          Manage parking venues and location details, generate QR codes,
-          and view live sensor occupancy and booking status.
-        </p>
-        <span class="open">Open Admin Dashboard <b>→</b></span>
-      </a>
-
-    </div>
-  </section>
-</main>
-
+<section class="hero">
+ <div class="hero-content">
+  <span class="eyebrow"><span class="dot"></span> Smart Parking · Connected Mobility</span>
+  <h1>Parking made<br><em>simple & smart.</em></h1>
+  <p>Find available parking, reserve your spot, remember where you parked, and monitor occupancy with one connected parking platform.</p>
+  <div class="actions">
+   <a class="btn primary" href="./consumer.html">Find Parking →</a>
+   <a class="btn secondary" href="./hardware.html">Explore Live Hardware ↗</a>
+  </div>
+  <div class="trust"><span>Live sensor dashboard</span><span>QR location saving</span><span>Connected parking</span></div>
+ </div>
+</section>
+<section class="section" id="features">
+ <div class="section-head"><div><div class="kicker">One platform · Three workspaces</div><h2>Everything parking, in one place.</h2><p>Choose the workspace that matches what you want to do.</p></div></div>
+ <div class="cards">
+  <a class="card" href="./consumer.html"><span class="number">01</span><div class="icon">🚘</div><h3>Consumer Dashboard</h3><p>Check slot status, book or cancel, scan a parking QR code, and save your car's location.</p><span class="card-link">Open Consumer Dashboard →</span></a>
+  <a class="card" href="./hardware.html"><span class="number">02</span><div class="icon">📡</div><h3>Hardware Dashboard</h3><p>Monitor ESP32 sensors, available and occupied slots, and entry/exit gate status.</p><span class="card-link">Open Hardware Dashboard →</span></a>
+  <a class="card" href="./admin.html"><span class="number">03</span><div class="icon">🛠️</div><h3>Admin Dashboard</h3><p>Manage venues, generate QR codes, and view occupancy and booking status.</p><span class="card-link">Open Admin Dashboard →</span></a>
+ </div>
+</section>
+<section class="section" id="how">
+ <div class="section-head"><div><div class="kicker">A simpler parking journey</div><h2>From arrival to finding your car.</h2><p>Designed to make parking easier for drivers and operators.</p></div></div>
+ <div class="steps">
+  <div class="step"><div class="step-num">STEP 01</div><h3>Check availability</h3><p>Review parking sensor status and booking availability.</p></div>
+  <div class="step"><div class="step-num">STEP 02</div><h3>Save your location</h3><p>Scan a location QR code and save floor, zone and pillar details.</p></div>
+  <div class="step"><div class="step-num">STEP 03</div><h3>Monitor the system</h3><p>Inspect sensor data and manage parking locations.</p></div>
+ </div>
+ <div class="banner"><div><div class="kicker">ParkSmart workspace</div><h2>Ready to make parking easier?</h2><p>Start with the consumer dashboard, or view your connected hardware demonstration.</p></div><div class="actions"><a class="btn primary" href="./consumer.html">Get Started →</a><a class="btn secondary" href="./hardware.html">View Hardware</a></div></div>
+</section>
+<footer><div><strong>🅿 ParkSmart</strong> · Smart Parking System</div><div>Consumer · Hardware · Admin</div><div>ECE IoT Project Demonstration</div></footer>
 </body>
 </html>
