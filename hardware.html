@@ -1,11 +1,175 @@
-<!DOCTYPE html><n<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>ParkSmart | Hardware</title><link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet"><style>
-:root{--bg:#080f20;--panel:#111e34;--line:#263a59;--text:#eef5ff;--muted:#91a4c0;--blue:#4388ff;--cyan:#39d5e8;--green:#35d49a;--red:#ff7185;--amber:#ffc66d}*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 80% -10%,#1a3a66,transparent 38%),var(--bg);color:var(--text);font-family:'DM Sans',sans-serif}.layout{display:flex;min-height:100vh}.side{width:250px;background:#0b1529;border-right:1px solid var(--line);padding:26px 19px;display:flex;flex-direction:column}.brand{display:flex;gap:11px;align-items:center;margin:0 7px 35px}.logo{background:linear-gradient(135deg,var(--blue),var(--cyan));width:42px;height:42px;border-radius:13px;display:grid;place-items:center}.brand b{font:700 20px 'Space Grotesk'}.brand small{display:block;color:var(--muted);font-size:10px;letter-spacing:1.5px}.label{font-size:10px;letter-spacing:1.8px;color:#607493;padding:0 12px}.nav a{display:flex;gap:12px;align-items:center;padding:13px 12px;margin:5px 0;border-radius:11px;text-decoration:none;color:#9eb1ce;font-weight:600;font-size:14px}.nav a.active,.nav a:hover{background:#18365f;color:white;box-shadow:inset 3px 0 var(--cyan)}.nav svg{width:19px;height:19px}.sidebottom{margin-top:auto;border:1px solid var(--line);padding:14px;border-radius:13px;color:var(--muted);font-size:12px}.sidebottom b{display:block;color:white;margin-bottom:4px}.main{flex:1;padding:32px clamp(18px,4vw,55px);max-width:1450px;margin:auto;width:100%}.header{display:flex;justify-content:space-between;align-items:center;margin-bottom:28px;gap:12px}.eyebrow{font-size:11px;color:var(--cyan);font-weight:700;letter-spacing:2px}.header h1{font:700 32px 'Space Grotesk';margin:8px 0}.muted{color:var(--muted);font-size:13px}.live{border:1px solid #285b54;background:#102b30;color:#7de6c4;padding:10px 14px;border-radius:25px;font-size:12px;font-weight:700;white-space:nowrap}.live i{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--green);margin-right:8px}.intro{border:1px solid #31527c;border-radius:18px;padding:20px 23px;background:linear-gradient(110deg,#142d50,#102139);display:flex;justify-content:space-between;align-items:center;margin-bottom:25px}.intro b{font:600 17px 'Space Grotesk'}.intro p{margin:6px 0 0;color:#9eb2ce;font-size:13px}.pill{border-radius:30px;padding:7px 11px;font-size:11px;font-weight:700;background:#1b3558;color:#b9d8ff}.section{font:600 19px 'Space Grotesk';margin:30px 0 15px}.slots{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:15px}.slot,.gate{background:linear-gradient(145deg,#14223b,#101a2e);border:1px solid var(--line);border-radius:17px;padding:20px;box-shadow:0 15px 35px #02081766}.slothead{display:flex;justify-content:space-between;align-items:center}.slotnum{font:600 15px 'Space Grotesk'}.car{width:55px;height:55px;border-radius:15px;background:#1c385f;display:grid;place-items:center;color:#77dced;margin:20px 0 15px}.car svg{width:34px;height:34px}.state{font-size:12px;font-weight:700;letter-spacing:.5px}.available{color:var(--green)}.occupied{color:var(--red)}.reserved{color:var(--amber)}.unknown{color:var(--muted)}.slot small{display:block;color:var(--muted);font-size:12px;margin-top:7px}.gates{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px}.gate{display:flex;align-items:center;gap:18px}.gateicon{width:52px;height:52px;border-radius:15px;background:#1b365b;color:var(--cyan);display:grid;place-items:center}.gateicon svg{width:28px;height:28px}.gate h3{font:600 16px 'Space Grotesk';margin:0 0 7px}.foot{border-top:1px solid var(--line);margin-top:35px;padding-top:17px;color:#7185a4;font-size:12px}@media(max-width:950px){.slots{grid-template-columns:repeat(2,1fr)}}@media(max-width:650px){.layout{display:block}.side{width:100%;padding:13px 15px;border-right:0;border-bottom:1px solid var(--line)}.brand{margin:0}.label,.sidebottom{display:none}.nav{display:flex;gap:4px;overflow:auto;margin-top:10px}.nav a{white-space:nowrap;padding:9px 11px;font-size:12px}.main{padding:22px 15px}.header h1{font-size:27px}.live{font-size:0;padding:10px}.live i{margin:0}.intro{padding:17px}.slots{gap:10px}.slot{padding:15px}.gates{grid-template-columns:1fr}.gate{padding:16px}}
-</style></head><body><div class="layout"><aside class="side"><div class="brand"><div class="logo"><svg viewBox="0 0 24 24" width="25" fill="none" stroke="white" stroke-width="2"><path d="M3 13h18l-2-6H5l-2 6Z"/><path d="M5 13v5m14-5v5M7 18h10M7 7l1-3h8l1 3"/></svg></div><div><b>ParkSmart</b><small>SMART PARKING</small></div></div><div class="label">WORKSPACE</div><nav class="nav"><a href="index.html">▦ &nbsp; Overview</a><a class="active" href="hardware.html">▤ &nbsp; Hardware</a><a href="consumer.html">♙ &nbsp; Consumer</a><a href="admin.html">⬡ &nbsp; Admin</a></nav><div class="sidebottom"><b>Live hardware</b>ESP32 · Firebase realtime</div></aside><main class="main"><header class="header"><div><div class="eyebrow">PARKSMART / HARDWARE</div><h1>Hardware Dashboard</h1><div class="muted">Live parking occupancy and gate signals.</div></div><div class="live"><i></i> LIVE DATA</div></header><section class="intro"><div><b>Parking floor overview</b><p>Four parking slots and two gate signals, updated from Firebase.</p></div><span class="pill" id="connection">CONNECTING</span></section><div class="section">Parking slots <span class="muted">/ 04</span></div><section class="slots" id="slots"><article class="slot"><div class="slotnum">SLOT 01</div><div class="car">🚘</div><div class="state unknown">CONNECTING</div></article><article class="slot"><div class="slotnum">SLOT 02</div><div class="car">🚘</div><div class="state unknown">CONNECTING</div></article><article class="slot"><div class="slotnum">SLOT 03</div><div class="car">🚘</div><div class="state unknown">CONNECTING</div></article><article class="slot"><div class="slotnum">SLOT 04</div><div class="car">🚘</div><div class="state unknown">CONNECTING</div></article></section><div class="section">Gate status <span class="muted">/ 02</span></div><section class="gates"><article class="gate"><div class="gateicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 20V5h3v15M7 8l13-4M7 12l13-4M7 16l13-4"/><path d="M2 20h20"/></svg></div><div><h3>Entry Gate</h3><div class="state unknown" id="entry">CONNECTING</div></div></article><article class="gate"><div class="gateicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 20V5h3v15M7 8l13-4M7 12l13-4M7 16l13-4"/><path d="M2 20h20"/></svg></div><div><h3>Exit Gate</h3><div class="state unknown" id="exit">CONNECTING</div></div></article></section><footer class="foot">ParkSmart · Live status from ESP32 through Firebase Realtime Database.</footer></main></div>
-<script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-app-compat.js"></script><script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-auth-compat.js"></script><script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-database-compat.js"></script><script>
-const firebaseConfig={apiKey:"AIzaSyAsffyVnKES_-tZz3pnuojPLPFBk3TJe5",authDomain:"smartpark-9ecbb.firebaseapp.com",databaseURL:"https://smartpark-9ecbb-default-rtdb.asia-southeast1.firebasedatabase.app",projectId:"smartpark-9ecbb",storageBucket:"smartpark-9ecbb.firebasestorage.app",messagingSenderId:"423958538578",appId:"1:423958538578:web:b7c5395f8348e3a00f728b"};
-firebase.initializeApp(firebaseConfig);const auth=firebase.auth(),db=firebase.database();const carSvg='<svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m7 23 3-9h20l3 9v9H7zM10 23h20M13 14l2-5h10l2 5"/><circle cx="12" cy="29" r="2"/><circle cx="28" cy="29" r="2"/></svg>';
-function status(v){const s=String(v||'UNKNOWN').toUpperCase();if(s.includes('OCCUPIED'))return ['OCCUPIED','occupied'];if(s.includes('AVAILABLE'))return ['AVAILABLE','available'];return ['UNKNOWN','unknown']}
-function renderSlots(slots,bookings){document.getElementById('slots').innerHTML=[1,2,3,4].map(n=>{const id='slot'+n,[raw,cls]=status(slots?.[id]);const booking=bookings?.[id];const active=booking&&booking.status==='ACTIVE';const label=cls==='occupied'?'OCCUPIED':active?'RESERVED':raw;const finalCls=cls==='occupied'?'occupied':active?'reserved':cls;return `<article class="slot"><div class="slothead"><div class="slotnum">SLOT 0${n}</div><span class="pill">${id.toUpperCase()}</span></div><div class="car">${carSvg}</div><div class="state ${finalCls}">${label}</div><small>${label==='AVAILABLE'?'Ready for parking':label==='OCCUPIED'?'Vehicle detected':label==='RESERVED'?'Active booking':'Waiting for sensor data'}</small></article>`}).join('')}
-function gate(id,el){db.ref('parksmart/gate/'+id).on('value',s=>{const v=String(s.val()||'UNKNOWN').toUpperCase();el.textContent=v==='OPEN'?'OPEN':v==='CLOSED'?'CLOSED':v;el.className='state '+(v==='OPEN'?'available':v==='CLOSED'?'occupied':'unknown')})}
-auth.signInAnonymously().then(()=>{document.getElementById('connection').textContent='CONNECTED';db.ref('parksmart').on('value',s=>{const d=s.val()||{};renderSlots(d.slots||{},d.bookings||{})},e=>{document.getElementById('connection').textContent='DB ERROR';console.error(e)});gate('entry',document.getElementById('entry'));gate('exit',document.getElementById('exit'))}).catch(e=>{document.getElementById('connection').textContent='OFFLINE';console.error(e)});
-</script></body></html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ParkSmart | Hardware Dashboard</title>
+<script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-database-compat.js"></script>
+<style>
+:root{--bg:#061225;--nav:#041126;--card:#0c2038;--line:#203d5b;--cyan:#4bd4ff;--muted:#a9bdd5;--white:#f5f9ff}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--white);font-family:Inter,"Segoe UI",Arial,sans-serif}
+a{color:inherit;text-decoration:none}.layout{display:grid;grid-template-columns:240px 1fr;min-height:100vh}
+aside{background:var(--nav);border-right:1px solid #1b2c43;padding:25px 17px}
+.brand{font-size:22px;font-weight:850;color:#60d7ff;margin:0 0 35px}
+nav a{display:block;padding:13px 14px;border-radius:11px;color:var(--muted);margin:5px 0}
+nav a.active,nav a:hover{background:#102c49;color:var(--cyan)}
+main{padding:34px;min-width:0}.top{display:flex;justify-content:space-between;align-items:center;gap:15px;flex-wrap:wrap}
+.kicker{color:var(--cyan);font-size:11px;font-weight:900;letter-spacing:1.8px}
+h1{font-size:32px;margin:9px 0}.muted{color:var(--muted);font-size:14px}
+.pill{padding:9px 13px;border-radius:30px;background:#123b35;color:#67f2c5;font-size:12px;font-weight:800}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;margin-top:25px}
+.card{background:linear-gradient(145deg,#102c49,#081a30);border:1px solid var(--line);border-radius:20px;padding:23px;min-width:0}
+.cardhead{display:flex;justify-content:space-between;align-items:center}
+.caricon{width:58px;height:58px;border-radius:16px;background:#12466a;display:grid;place-items:center;color:#a6eaff}
+.caricon svg{width:35px;height:35px}
+.status{font-size:11px;font-weight:850;padding:8px 12px;border-radius:30px;background:#123b35;color:#67f2c5}
+.status.occupied{background:#48252e;color:#ff9ba9}.status.reserved{background:#45371d;color:#ffd77c}
+.card h2{font-size:21px;margin:22px 0 7px}.slotid{color:#7f9bb9;font-size:12px;letter-spacing:1px}
+.gates{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;margin-top:18px}
+.gate{display:flex;align-items:center;gap:16px}.gateicon{width:52px;height:52px;border-radius:15px;background:#12466a;display:grid;place-items:center;color:#a6eaff;font-size:25px}
+.gate h3{margin:0 0 8px;font-size:17px}.notice{margin-top:20px;padding:15px 18px;border:1px solid var(--line);border-radius:14px;color:var(--muted);font-size:13px;line-height:1.5;background:#091a2d}
+@media(max-width:760px){.layout{grid-template-columns:1fr}aside{padding:15px;border-right:0;border-bottom:1px solid #1b2c43}.brand{margin:0 0 12px}nav{display:flex;gap:5px;flex-wrap:wrap}nav a{padding:9px 11px;margin:0}main{padding:20px}.grid,.gates{grid-template-columns:1fr}h1{font-size:27px}}
+</style>
+</head>
+<body>
+<div class="layout">
+<aside>
+  <div class="brand">▣ ParkSmart</div>
+  <nav>
+    <a href="index.html">Home</a>
+    <a href="consumer.html">Consumer</a>
+    <a class="active" href="hardware.html">Hardware</a>
+    <a href="admin.html">Admin</a>
+  </nav>
+</aside>
+
+<main>
+  <header class="top">
+    <div>
+      <div class="kicker">LIVE IOT MONITORING</div>
+      <h1>Hardware Dashboard</h1>
+      <div class="muted">Live parking occupancy and gate status</div>
+    </div>
+    <span class="pill" id="connection">Connecting to Firebase…</span>
+  </header>
+
+  <section class="grid" id="slots"></section>
+  <section class="gates" id="gates"></section>
+
+  <div class="notice">
+    Slot and gate states are read from Firebase. Gate status shows the reported state; it does not operate a physical servo.
+  </div>
+</main>
+</div>
+
+<script>
+const firebaseConfig = {
+ Smarpark
+Web App
+App nickname
+Smarpark
+App ID 
+1:423958538578:web:b7c5395f8348e3a00f728b
+SDK setup and configuration
+
+npm
+
+CDN
+
+Config
+Get the snippet for your app's Firebase config object. Learn more.
+
+Firebase configuration object containing keys and identifiers for your app:
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAsffyVnKES_-tZz3pnuojPLPFBk3TJe5E",
+  authDomain: "smartpark-9ecbb.firebaseapp.com",
+  databaseURL: "https://smartpark-9ecbb-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "smartpark-9ecbb",
+  storageBucket: "smartpark-9ecbb.firebasestorage.app",
+  messagingSenderId: "423958538578",
+  appId: "1:423958538578:web:b7c5395f8348e3a00f728b"
+};
+
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.database();
+
+const carSvg = `
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+     stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+  <path d="m3 13 2-6h14l2 6v6H3z"/>
+  <path d="M5 13h14M7 17h.01M17 17h.01M7 7l1-3h8l1 3"/>
+</svg>`;
+
+const slotIds = ["slot1","slot2","slot3","slot4"];
+
+function renderSlots(slots, bookings = {}) {
+  document.getElementById("slots").innerHTML = slotIds.map((id,index) => {
+    const sensor = String(slots[id] || "UNKNOWN").toUpperCase();
+    const reserved = Object.values(bookings).some(
+      b => b && b.slot === id && b.status === "ACTIVE"
+    );
+
+    const state = sensor === "OCCUPIED" ? "OCCUPIED"
+      : reserved ? "RESERVED"
+      : sensor === "AVAILABLE" ? "AVAILABLE"
+      : "UNKNOWN";
+
+    const cls = state === "OCCUPIED" ? "occupied"
+      : state === "RESERVED" ? "reserved" : "";
+
+    return `
+      <article class="card">
+        <div class="cardhead">
+          <span class="caricon">${carSvg}</span>
+          <span class="status ${cls}">${state}</span>
+        </div>
+        <h2>Parking Slot ${index + 1}</h2>
+        <div class="slotid">${id.toUpperCase()}</div>
+      </article>`;
+  }).join("");
+}
+
+function renderGates(data) {
+  const gateIds = ["entry","exit"];
+  document.getElementById("gates").innerHTML = gateIds.map(id => {
+    const state = String(data[id] || "CLOSED").toUpperCase();
+    return `
+      <article class="card gate">
+        <span class="gateicon">↔</span>
+        <div>
+          <div class="kicker">${id.toUpperCase()} GATE</div>
+          <h3>${state === "OPEN" ? "OPEN" : "CLOSED"}</h3>
+          <div class="muted">Firebase reported state</div>
+        </div>
+      </article>`;
+  }).join("");
+}
+
+auth.signInAnonymously().then(() => {
+  document.getElementById("connection").textContent = "● Firebase connected";
+
+  db.ref("parksmart/slots").on("value", snapshot => {
+    renderSlots(snapshot.val() || {});
+  });
+
+  db.ref("parksmart/bookings").on("value", snapshot => {
+    db.ref("parksmart/slots").once("value").then(slotSnapshot => {
+      renderSlots(slotSnapshot.val() || {}, snapshot.val() || {});
+    });
+  });
+
+  db.ref("parksmart/gate").on("value", snapshot => {
+    renderGates(snapshot.val() || {});
+  });
+}).catch(error => {
+  document.getElementById("connection").textContent = "Firebase error";
+  document.getElementById("slots").innerHTML =
+    `<article class="card">${error.message}</article>`;
+});
+</script>
+</body>
+</html>
